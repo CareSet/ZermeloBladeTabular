@@ -1,0 +1,79 @@
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+html,body {
+    height:100%;
+}
+
+.view_contents {
+    padding-top: 0px;
+    min-height: calc(100% - 100px);
+    height: calc(100% - 100px);
+    width: 100%;
+}
+.force_visual {
+    height:100%;
+    width:100%;
+}
+
+
+.cursor {
+    fill: none;
+    stroke: brown;
+    pointer-events: none;
+}
+
+text.node-label
+{
+    font-size:12px;
+    font-weight:bold;
+    text-shadow: 0px 0px 4px #fff;
+}
+
+div.gui-buttons
+{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+div.gui-buttons > button
+{
+    padding: 0px 10px 0px 10px;
+    line-height: 20px;
+}
+
+text.node-label
+{
+    font-size:12px;
+    font-weight:bold;
+    text-shadow: 0px 0px 4px #fff;
+}
+
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    margin: 10px;
+    padding: 10px;
+    font: 12px sans-serif;
+    width: 200px;
+    background: black;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    color:white;
+}
+
+.node.transparent, .link.transparent, g.transparent
+{
+    /*visibility: hidden;*/
+    opacity: 0.2 !important;
+}
+
+.node_type_name, .link_type_name
+{
+    margin-left: 10px;
+}

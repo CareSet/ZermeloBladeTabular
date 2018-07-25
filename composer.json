@@ -1,0 +1,25 @@
+{
+    "name": "careset/zermelobladetabular",
+    "version": "0.0.1",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4" : {
+            "CareSet\\ZermeloBladeTabular\\" : "src/"
+        }
+    },
+    "extra": {
+         "branch-alias": {
+            "dev-master": "0.0.1-dev"
+        },
+	    "laravel": {
+	        "providers": [
+	            "CareSet\\ZermeloBladeTabular\\ServiceProvider"
+	        ]
+	    }
+	},
+     "config": {
+        "sort-packages": true
+    }
+}
