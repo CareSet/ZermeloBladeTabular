@@ -1,5 +1,5 @@
 # ZermeloBladeTabularBlade
-Blade based view for Zermelo reporting engine
+Blade based tabular view for Zermelo reporting engine
 
 How to get started using it
 -------------------------
