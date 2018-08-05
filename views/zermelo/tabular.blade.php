@@ -1,11 +1,14 @@
 <div class="container-fluid">
 	<div>
-		<h1>{{ $presenter->getReport()->getReportName()  }}</h1>
+		<h1> {{ $presenter->getReport()->getReportName()  }}</h1>
 	</div>
 	<div>
 		{!! $presenter->getReport()->getReportDescription() !!}
 	</div>
 
+	<div id='json_error_message' class="alert alert-danger" role="alert">
+
+	</div>
 
 	<div class="row">
 		<div class="col-xs-12">
@@ -42,7 +45,25 @@
             {
                 'token': '{{ $presenter->getToken() }}',
                 'request-form-input': '{!! urlencode($presenter->getReport()->getRequestFormInput(true)) !!}',
-            }).always(function(data) {
+            }).fail(function( jqxhr, textStatus, error) {
+
+		console.log(jqxhr);
+		console.log(textStatus);
+		console.log(error);
+		
+		var is_admin = true; //this should be set via a call to the presenter
+	
+		if(is_admin){
+			if(typeof jqxhr.responseJSON.message !== 'undefined'){
+				$('#json_error_message').html("<h1> You had a error </h1> <p> " + jqxhr.responseJSON.message + "</p>");
+			}else{
+				$('#json_error_message').html("<h1> You had a error, bad enough that there was no JSON  </h1>");
+			}
+		}else{
+			$('#json_error_message').html("<h1> There was an error generating this report</h1>");	
+		}
+
+	    }).done(function(data) {
 
 
             function resizeTable()
