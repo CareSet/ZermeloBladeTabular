@@ -6,7 +6,7 @@
 		{!! $presenter->getReport()->getReportDescription() !!}
 	</div>
 
-	<div id='json_error_message' class="alert alert-danger" role="alert">
+	<div style='display: none' id='json_error_message' class="alert alert-danger" role="alert">
 
 	</div>
 
@@ -52,7 +52,7 @@
 		console.log(error);
 		
 		var is_admin = true; //this should be set via a call to the presenter
-	
+
 		if(is_admin){
 			if(typeof jqxhr.responseJSON.message !== 'undefined'){
 				$('#json_error_message').html("<h1> You had a error </h1> <p> " + jqxhr.responseJSON.message + "</p>");
@@ -62,6 +62,7 @@
 		}else{
 			$('#json_error_message').html("<h1> There was an error generating this report</h1>");	
 		}
+		$('#json_error_message').show();	
 
 	    }).done(function(data) {
 
