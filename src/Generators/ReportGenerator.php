@@ -59,7 +59,8 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         /*
         Run the MapRow once to get the proper column name from the Report
          */
-        $data_row = $Report->MapRow($data_row);
+	$first_row_num = 0; 
+        $data_row = $Report->MapRow($data_row, $first_row_num ); //
         $mapped_header = array_keys($data_row);
 
 
@@ -325,9 +326,9 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         /*
         Transform each row using $Report->MapRow()
          */
-        $paging->getCollection()->transform(function ($value) use ($Report) {
+        $paging->getCollection()->transform(function ($value, $key) use ($Report) {
             $value_array = json_decode(json_encode($value), true);
-            return json_decode(json_encode($Report->MapRow($value_array)));
+            return json_decode(json_encode($Report->MapRow($value_array, $key)));
         });
 
         /*
