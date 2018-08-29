@@ -10,11 +10,7 @@
 
 	</div>
 
-	<div class="row">
-		<div class="col-xs-12">
-			<table class="table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%"></table>
-		</div>
-	</div>
+	<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%"></table>
 </div>
 
 
@@ -25,14 +21,14 @@
 
 
 <script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/datatables.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/jquery.dataTables.yadcf.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/js/popper.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/datatables/datatables.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/moment.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/daterangepicker.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/d3.v4.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/datatables.fixedcolumns.destroy.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.doubleScroll.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/js/jquery.dataTables.yadcf.js"></script>
 
 <script type="text/javascript">
 
@@ -255,7 +251,7 @@
             var ReportTable = $('#report_datatable').DataTable( {
                 pageLength: defaultPageLength,
 
-                dom: '<"report-table-wrapper"Z<"table-control"<"pull-left control-box"Blf<"after-menu-addition">><"pull-right"ip><"clearfix"><"#report_menu_wrapper">>tr>',
+                dom: '<"report-table-wrapper"<"table-control"<"float-left control-box"Blf<"after-menu-addition">><"float-right"ip><"clearfix"><"#report_menu_wrapper">>tr>',
                 stateSave: true,
                 colReorder: true,
                 scrollX: true,
