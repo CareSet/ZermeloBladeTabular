@@ -5,26 +5,24 @@ namespace CareSet\ZermeloBladeTabular\Generators;
 use CareSet\Zermelo\Interfaces\CacheInterface;
 use CareSet\Zermelo\Interfaces\GeneratorInterface;
 use CareSet\Zermelo\Models\AbstractGenerator;
+use CareSet\Zermelo\Models\DatabaseCache;
+use CareSet\Zermelo\Models\ZermeloDatabase;
 use CareSet\Zermelo\Models\ZermeloReport;
 use CareSet\Zermelo\Exceptions\InvalidDatabaseTableException;
 use CareSet\Zermelo\Exceptions\InvalidHeaderFormatException;
 use CareSet\Zermelo\Exceptions\InvalidHeaderTagException;
 use CareSet\Zermelo\Exceptions\UnexpectedHeaderException;
 use CareSet\Zermelo\Exceptions\UnexpectedMapRowException;
-use \DB;
 
 class ReportGenerator extends AbstractGenerator implements GeneratorInterface
 {
     const MAX_PAGING_LIMIT = 99999999999999;
 
-    protected $cacheInterface = null;
-    protected $_database = null;
-    protected $_table = null;
+    protected $cache = null;
 
-
-    public function __construct( CacheInterface $cacheInterface )
+    public function __construct( DatabaseCache $cache )
     {
-        $this->cacheInterface = $cacheInterface;
+        $this->cache = $cache;
     }
 
     public function init( array $params = null )
@@ -32,36 +30,34 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         parent::init( $params );
     }
 
-    public function setCache( CacheInterface $cacheInterface )
+    public function getHeader( bool $includeSummary = false )
     {
-        $this->cacheInterface = $cacheInterface;
-    }
-
-
-    public function getHeader( ZermeloReport $Report, bool $includeSummary = false )
-    {
-        $Table = clone $this->_Table;
+        $Table = clone $this->cache->getTable();
         $data_row = $Table->first();
-
 
         $headers = []; //this is used to store the headers before and after the column definition
         $mapped_header = []; //this is the result from the MapRow function
         $original_array_key = []; //this is the original field name from the table
-        $fields = $this->_columns;
+        $fields = $this->cache->getColumns();
 
         //convert stdClass to array
         $data_row = json_decode(json_encode($data_row), true);
-        if(!is_array($data_row)) 
+        $has_data = true;
+        if(!is_array($data_row)) {
             $data_row = [];
+            $has_data = false;
+        }
         
         $original_array_key = array_keys($data_row);
 
         /*
         Run the MapRow once to get the proper column name from the Report
          */
-	$first_row_num = 0; 
-        $data_row = $Report->MapRow($data_row, $first_row_num ); //
-        $mapped_header = array_keys($data_row);
+	    $first_row_num = 0;
+	    if ( $has_data ) {
+            $data_row = $this->cache->MapRow( $data_row, $first_row_num ); //
+            $mapped_header = array_keys( $data_row );
+        }
 
 
         /*
@@ -83,20 +79,20 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         /*
         Determine the header format based on the column title and type
          */
-        $header_format = self::DefaultColumnFormat($Report, $header_format, $fields);
+        $header_format = self::DefaultColumnFormat($this->cache->getReport(), $header_format, $fields);
 
         /*
         Override the default header with what the report gives back,
         then check to see if the format and tags are valid
          */
-        $Report->OverrideHeader($header_format, $header_tags);
+        $this->cache->OverrideHeader($header_format, $header_tags);
 
         foreach ($header_format as $name => $format) {
             if (!in_array($name, $mapped_header)) {
                 throw new UnexpectedHeaderException("Column header not found: {$name}");
             }
 
-            if ($format !== null && !in_array($format, $Report->VALID_COLUMN_FORMAT)) {
+            if ($format !== null && !in_array($format, $this->cache->getReport()->VALID_COLUMN_FORMAT)) {
                 throw new InvalidHeaderFormatException("Invalid column header format: {$format}");
             }
 
@@ -148,7 +144,7 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
                 }
             }
             $target_fields = implode(",", $target_fields);
-            $ResultTable = clone $this->_Table;
+            $ResultTable = clone $this->cache->getTable();
             $result = json_decode(json_encode($ResultTable->selectRaw($target_fields)->first()), true);
 
             /*
@@ -175,7 +171,7 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
             Check if any column are in the SUGGEST_NO_SUMMARY and add a flag
              */
             foreach ($summary_data as $name => $data) {
-                if (self::isColumnInKeyArray($name, $Report->SUGGEST_NO_SUMMARY)) {
+                if (ZermeloDatabase::isColumnInKeyArray($name, $this->cache->getReport()->SUGGEST_NO_SUMMARY)) {
                     $summary_data[$name]['NO_SUMMARY'] = true;
                 }
             }
@@ -207,7 +203,7 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
 
     public function paginate($length)
     {
-        $Pager = clone $this->_Table;
+        $Pager = clone $this->cache->getTable();
         return $Pager->paginate($length);
     }
 
@@ -225,19 +221,19 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
     {
         foreach ($format as $name => $value) {
 
-            if (self::isColumnInKeyArray($name, $Report->DETAIL)) {
+            if (ZermeloDatabase::isColumnInKeyArray($name, $Report->DETAIL)) {
                 $format[$name] = 'DETAIL';
-            } else if (self::isColumnInKeyArray($name, $Report->URL) && in_array($fields[$name]["Type"], ["string"])) {
+            } else if (ZermeloDatabase::isColumnInKeyArray($name, $Report->URL) && in_array($fields[$name]["Type"], ["string"])) {
                 $format[$name] = 'URL';
-            } else if (self::isColumnInKeyArray($name, $Report->CURRENCY) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
+            } else if (ZermeloDatabase::isColumnInKeyArray($name, $Report->CURRENCY) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
                 $format[$name] = 'CURRENCY';
-            } else if (self::isColumnInKeyArray($name, $Report->NUMBER) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
+            } else if (ZermeloDatabase::isColumnInKeyArray($name, $Report->NUMBER) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
                 $format[$name] = 'NUMBER';
-            } else if (self::isColumnInKeyArray($name, $Report->DECIMAL) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
+            } else if (ZermeloDatabase::isColumnInKeyArray($name, $Report->DECIMAL) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
                 $format[$name] = 'DECIMAL';
             } else if (in_array($fields[$name]["Type"], ["date", "time", "datetime"])) {
                 $format[$name] = strtoupper($fields[$name]["Type"]);
-            } else if (self::isColumnInKeyArray($name, $Report->PERCENT) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
+            } else if (ZermeloDatabase::isColumnInKeyArray($name, $Report->PERCENT) /* && in_array($fields[$name]["Type"],["integer","decimal"])*/) {
                 $format[$name] = 'PERCENT';
             }
 
@@ -253,16 +249,13 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
      * @param ZermeloReport $Report
      * @return Collection
      */
-    public function toJson( ZermeloReport $Report )
+    public function toJson()
     {
+        $Report = $this->cache->getReport();
         $input_bolt = $Report->getParameter('data-option' );
         $report_name = trim($Report->getClassName());
         $Code = $Report->getCode();
         $Parameters = $Report->getParameters();
-
-        $cache_key = md5($Report->getClassName() . "-" . $Code . "-" . $Report->GetBoltId() . "-" . implode("-", $Parameters));
-        $cache_table_stub = "Report_{$cache_key}";
-        $cache_table = config("zermelo.CACHE_DB") . ".{$cache_table_stub}";
 
         $paging_length = $Report->getInput("length") ?? 1000;
 
@@ -274,25 +267,6 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
             $paging_length = self::MAX_PAGING_LIMIT;
         }
         /* no limit*/
-
-        DB::statement(DB::raw("CREATE DATABASE IF NOT EXISTS " . config("zermelo.CACHE_DB") . ";"));
-        DB::statement(DB::raw("SET SESSION group_concat_max_len = 1000000;"));
-
-
-        $this->cacheInterface->init( $Report );
-
-        if (!$this->cacheInterface->exists() || !$this->cacheInterface->isCacheable()) {
-            $this->cacheInterface->CacheReport($Report);
-        } else if ($this->cacheInterface->exists() && $this->cacheInterface->CheckUpdateCacheForReport($Report)) {
-            $this->cacheInterface->CacheReport($Report);
-        }
-
-        $this->setCache( $this->cacheInterface );
-
-        // This is BAD
-        $cache_db = $this->cacheInterface->getCacheDB();
-        $cache_table_stub = $this->cacheInterface->getCacheTableStub();
-        $this->init( ['database' => $cache_db, 'table' => $cache_table_stub ] );
 
         /*
         If there is a filter, lets apply it to each column
@@ -334,7 +308,7 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         /*
         Add in the report name/description/columns
          */
-        $reportSummary = new ReportSummaryGenerator( $this->cacheInterface );
+        $reportSummary = new ReportSummaryGenerator( $this->cache );
         $custom = collect($reportSummary->toJson($Report));
 
         $merge = $custom->merge($paging);

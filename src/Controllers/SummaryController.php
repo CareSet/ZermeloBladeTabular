@@ -11,9 +11,10 @@ class SummaryController implements ControllerInterface
 {
     public function show( ZermeloReport $report )
     {
-        $cache = new DatabaseCache();
+        // Wrap the report in cache
+        $cache = new DatabaseCache( $report );
         $generator = new ReportSummaryGenerator( $cache );
-        return $generator->toJson( $report );
+        return $generator->toJson();
     }
 
     public function prefix() : string

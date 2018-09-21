@@ -17,9 +17,9 @@ class ApiController implements ControllerInterface
         $presenter->setApiPrefix( api_prefix() );
         $presenter->setReportPath( config('zermelobladetabular.TABULAR_URI_PREFIX') );
         $presenter->setSummaryPath( config('zermelobladetabular.SUMMARY_URI_PREFIX') );
-        $cache = new DatabaseCache();
+        $cache = new DatabaseCache( $report );
         $generator = new ReportGenerator( $cache );
-        return $generator->toJson( $report );
+        return $generator->toJson();
     }
 
     public function prefix() : string

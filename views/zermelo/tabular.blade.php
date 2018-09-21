@@ -6,13 +6,17 @@
 		{!! $presenter->getReport()->getReportDescription() !!}
 	</div>
 
+	<div id="user-variables" style="display:none">
+		<input type="hidden" id="clear_cache" value=""/>
+		<input type="hidden" id="cache_expires" value=""/>
+	</div>
+
 	<div style='display: none' id='json_error_message' class="alert alert-danger" role="alert">
 
 	</div>
 
-	<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%"></table>
+	<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%;"></table>
 </div>
-
 
 <div id="bottom_locator" style="
     position: fixed;
@@ -37,11 +41,39 @@
         var columnMap = [];
         var fixedColumns = null;
 
-        $.getJSON('{{ $presenter->getSummaryUri() }}',
-            {
-                'token': '{{ $presenter->getToken() }}',
-                'request-form-input': '{!! urlencode($presenter->getReport()->getRequestFormInput(true)) !!}',
-            }).fail(function( jqxhr, textStatus, error) {
+        function set_cache_timer()
+		{
+            setInterval(function(){
+                // Check to see if cache is about to expire (<1 minute)
+				var cacheExpires = Date.parse( $("#cache_expires").val() );
+				var now = Date.now();
+				if ( ( cacheExpires - now ) > 0 &&
+					( cacheExpires - now ) < 10000 ) {
+				    if ( $("#cache-icon").hasClass( "text-warning" ) ) {
+                        $("#cache-icon").removeClass("text-danger");
+                        $("#cache-icon").removeClass("text-warning");
+                        $("#cache-icon").addClass("text-primary");
+					} else {
+                        $("#cache-icon").removeClass("text-primary");
+                        $("#cache-icon").removeClass("text-danger");
+                        $("#cache-icon").addClass("text-warning");
+					}
+
+				} else if ( ( now - cacheExpires ) > 0 ) {
+                    $("#cache-icon").removeClass("text-primary");
+                    $("#cache-icon").removeClass("text-danger");
+                    $("#cache-icon").addClass("text-warning");
+				}
+            }, 1000 );
+		}
+
+        set_cache_timer();
+        var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
+        var param = decodeURIComponent( $.param(passthrough_params) );
+        $.getJSON(
+            '{{ $presenter->getSummaryUri()."/".urlencode($presenter->getReport()->getRequestFormInput(false)) }}',
+			param
+		).fail(function( jqxhr, textStatus, error) {
 
 		console.log(jqxhr);
 		console.log(textStatus);
@@ -74,8 +106,8 @@
 
             }
 
-            var formatHeader = function (data, columnIdx) {
-                var jHtmlObject = jQuery('<p>' + data + '</p>');
+            var formatHeader = function (header_data, columnIdx) {
+                var jHtmlObject = jQuery('<p>' + header_data + '</p>');
                 var parent = jQuery("<p>").append(jHtmlObject);
                 parent.find(".yadcf-filter ").remove();
                 var newHtml = parent.text();
@@ -133,6 +165,66 @@
                     },
                     titleAttr: 'Print',
                     init: function ( dt, node, config ) { $(node).tooltip(); }
+                },
+                {
+                    extend: 'collection',
+                    name: 'cache',
+                    attr: {
+                        id: 'cache-meta-button'
+                    },
+                    autoClose: true,
+                    text: '&nbsp;<i id="cache-icon" class="fa fa-database"></i>&nbsp;',
+                    className: 'cache-meta-info',
+                    init: function (dt, node, config) {
+                        var cache_enabled = data.cache_meta_cache_enabled;
+                        var generated_this_request = data.cache_meta_generated_this_request;
+                        if ( cache_enabled ) {
+                            if ( !generated_this_request ) {
+                                $(node).find(".fa-database").addClass("text-danger");
+                            } else {
+                                $(node).find(".fa-database").addClass("text-primary");
+                            }
+                        }
+                        var info = "Last Generated: " + data.cache_meta_last_generated+"<br/>";
+                        info += "Expires: " + data.cache_meta_expire_time;
+
+                        $("#cache_expires").val( data.cache_meta_expire_time );
+
+                        $(node).tooltip({
+							html: true,
+                            title: info,
+                            template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner large"></div></div>'
+                        });
+                    },
+					buttons : [
+                        {
+                            text: 'Clear Cache',
+                            action: function ( e, dt, node, config ) {
+
+                                $("#clear_cache").val( true );
+                                $("#report_datatable").DataTable().ajax.reload( function ( json ) {
+                                    var cache_enabled = json.cache_meta_cache_enabled;
+                                    var generated_this_request = json.cache_meta_generated_this_request;
+                                    if ( cache_enabled ) {
+                                        if ( !generated_this_request ) {
+                                            $("#cache-icon").removeClass("text-primary");
+                                            $("#cache-icon").addClass("text-danger");
+                                        } else {
+                                            $("#cache-icon").removeClass("text-danger");
+                                            $("#cache-icon").addClass("text-primary");
+                                        }
+                                    }
+                                    var info = "Last Generated: " + json.cache_meta_last_generated+"\n";
+                                    info += "Expires: " + json.cache_meta_expire_time;
+
+                                    $("#cache_expires").val( json.cache_meta_expire_time );
+                                    $("#cache-meta-button").attr("data-original-title", info);
+
+								});
+
+                            }
+                        }
+					]
                 }
             ];
 
@@ -330,6 +422,7 @@
                         "order": callbackOrder,
                         "length": data.length,
                         "filter": searches,
+						"clear_cache": $("#clear_cache").val()
                     };
                     var merge = $.extend({}, passthrough_params, merge_get_params)
                     localStorage.setItem("Zermelo_defaultPlageLength",data.length);
@@ -340,11 +433,32 @@
                     var param = decodeURIComponent( $.param(merge) );
                     $.getJSON('{{ $presenter->getReportUri() }}', param
                     ).always(function(data) {
+                        settings.json = data; // Make sure to set setting so callbacks have data
                         callback({
                             data: data.data,
                             recordsTotal: data.total,
                             recordsFiltered: data.total,
                         });
+                        $("#clear_cache").val("");
+
+                        var cache_enabled = data.cache_meta_cache_enabled;
+                        var generated_this_request = data.cache_meta_generated_this_request;
+                        if ( cache_enabled ) {
+                            if ( !generated_this_request ) {
+                                $("#cache-icon").removeClass("text-primary");
+                                $("#cache-icon").removeClass("text-warning");
+                                $("#cache-icon").addClass("text-danger");
+                            } else {
+                                $("#cache-icon").removeClass("text-danger");
+                                $("#cache-icon").removeClass("text-warning");
+                                $("#cache-icon").addClass("text-primary");
+                            }
+                        }
+                        var info = "Last Generated: " + data.cache_meta_last_generated+"\n";
+                        info += "Expires: " + data.cache_meta_expire_time;
+
+                        $("#cache_expires").val( data.cache_meta_expire_time );
+                        $("#cache-meta-button").attr("data-original-title", info);
                     });
                 },
 

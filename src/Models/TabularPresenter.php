@@ -30,6 +30,11 @@ class TabularPresenter extends AbstractPresenter
     protected $REPORT_VIEW = null;
 
 
+    public function getLastGenerated()
+    {
+
+    }
+
     /**
      * getReportView
      * Returns the $REPORT_VIEW value

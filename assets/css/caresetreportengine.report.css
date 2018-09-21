@@ -158,6 +158,10 @@ text.node-label
 	opacity: 0.2 !important;
 }
 
+.large.tooltip-inner {
+	max-width: 350px;
+	width: 350px;
+}
 
 .dt-buttons a.btn {
 	line-height: 32px;

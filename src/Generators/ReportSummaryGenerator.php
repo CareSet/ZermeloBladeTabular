@@ -15,33 +15,22 @@ use \DB;
 class ReportSummaryGenerator extends ReportGenerator implements GeneratorInterface
 {
 
-    public function toJson( ZermeloReport $Report )
+    public function toJson()
     {
         return [
-            'Report_Name' => $Report->getReportName(),
-            'Report_Description' => $Report->getReportDescription(),
-            'selected-data-option' => $Report->getParameter( 'data-option' ),
-            'columns' => $this->runSummary($Report)
+            'Report_Name' => $this->cache->getReport()->getReportName(),
+            'Report_Description' => $this->cache->getReport()->getReportDescription(),
+            'selected-data-option' => $this->cache->getReport()->getParameter( 'data-option' ),
+            'columns' => $this->runSummary(),
+            'cache_meta_generated_this_request' => $this->cache->getGeneratedThisRequest(),
+            'cache_meta_last_generated' => $this->cache->getLastGenerated(),
+            'cache_meta_expire_time' => $this->cache->getExpireTime(),
+            'cache_meta_cache_enabled' => $this->cache->getReport()->isCacheEnabled()
         ];
     }
 
-    public function runSummary( ZermeloReport $Report )
+    public function runSummary()
     {
-        $this->cacheInterface->init( $Report );
-
-        if (!$this->cacheInterface->exists() || !$this->cacheInterface->isCacheable()) {
-            $this->cacheInterface->CacheReport($Report);
-        } else if ($this->cacheInterface->exists() && $this->cacheInterface->CheckUpdateCacheForReport($Report)) {
-            $this->cacheInterface->CacheReport($Report);
-        }
-
-        $this->setCache( $this->cacheInterface );
-
-        // This is BAD
-        $cache_db = $this->cacheInterface->getCacheDB();
-        $cache_table_stub = $this->cacheInterface->getCacheTableStub();
-        $this->init( ['database' => $cache_db, 'table' => $cache_table_stub ] );
-
-        return $this->getHeader($Report,true);
+        return $this->getHeader(true);
     }
 }
