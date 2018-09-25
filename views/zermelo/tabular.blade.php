@@ -30,7 +30,6 @@
 <script type="text/javascript" src="/vendor/CareSet/datatables/datatables.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/moment.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/daterangepicker.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/d3.v4.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.doubleScroll.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.dataTables.yadcf.js"></script>
 
