@@ -213,12 +213,12 @@
                                             $("#cache-icon").addClass("text-primary");
                                         }
                                     }
-                                    var info = "Last Generated: " + json.cache_meta_last_generated+"\n";
+                                    var info = "Last Generated: " + json.cache_meta_last_generated+"<br/>";
                                     info += "Expires: " + json.cache_meta_expire_time;
 
                                     $("#cache_expires").val( json.cache_meta_expire_time );
                                     $("#cache-meta-button").attr("data-original-title", info);
-
+                                    $("#clear_cache").val( "" );
 								});
 
                             }
