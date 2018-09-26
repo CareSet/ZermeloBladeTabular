@@ -453,7 +453,7 @@
                                 $("#cache-icon").addClass("text-primary");
                             }
                         }
-                        var info = "Last Generated: " + data.cache_meta_last_generated+"\n";
+                        var info = "Last Generated: " + data.cache_meta_last_generated+"<br/>";
                         info += "Expires: " + data.cache_meta_expire_time;
 
                         $("#cache_expires").val( data.cache_meta_expire_time );
