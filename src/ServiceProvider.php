@@ -17,7 +17,7 @@ Class ServiceProvider extends AbstractZermeloProvider
         WebController::class
     ];
 
-    public function register()
+    protected function onBeforeRegister()
     {
         /*
          * Register our zermelo view make command which:
