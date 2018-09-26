@@ -11,16 +11,14 @@ use CareSet\ZermeloBladeTabular\Controllers\WebController;
 
 Class ServiceProvider extends AbstractZermeloProvider
 {
-
     protected $controllers = [
         ApiController::class,
         SummaryController::class,
         WebController::class
     ];
 
-    public function boot(\Illuminate\Routing\Router $router)
-	{
-
+    public function register()
+    {
         /*
          * Register our zermelo view make command which:
          *  - Copies views
@@ -48,5 +46,5 @@ Class ServiceProvider extends AbstractZermeloProvider
         }
 
         $this->loadViewsFrom( resource_path( 'views/zermelo' ), 'Zermelo');
-	}
+    }
 }
