@@ -297,12 +297,19 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
 
         $paging = $this->paginate($paging_length);
 
+
         /*
         Transform each row using $Report->MapRow()
          */
-        $paging->getCollection()->transform(function ($value, $key) use ($Report) {
-            $value_array = json_decode(json_encode($value), true);
-            return json_decode(json_encode($Report->MapRow($value_array, $key)));
+        $collection = $paging->getCollection();
+        $collection->transform(function ($value, $key) use ($Report) {
+            $value_array = $this->objectToArray( $value );
+            $mapped_row = $Report->MapRow($value_array, $key);
+            $mapped_and_encoded = [];
+            foreach ( $mapped_row as $mapped_key => $mapped_value ) {
+                $mapped_and_encoded[$mapped_key]= mb_convert_encoding( $mapped_value, 'UTF-8', 'UTF-8' );
+            }
+            return $this->arrayToObject($mapped_and_encoded );
         });
 
         /*
@@ -321,6 +328,32 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         }
 
         return $merge;
+    }
+
+    function objectToArray($d) {
+        if (is_object($d)) {
+            // Gets the properties of the given object
+            // with get_object_vars function
+            $d = get_object_vars($d);
+        }
+
+        if (is_array($d)) {
+            /*
+            * Return array converted to object
+            * Using __FUNCTION__ (Magic constant)
+            * for recursive call
+            */
+            return array_map([$this, 'objectToArray'], $d);
+        }
+        else {
+            // Return array
+            return $d;
+        }
+    }
+
+    function arrayToObject( $arr )
+    {
+        return json_decode( json_encode ( $arr ) );
     }
 
 }
