@@ -309,7 +309,7 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
             foreach ( $mapped_row as $mapped_key => $mapped_value ) {
                 $mapped_and_encoded[$mapped_key]= mb_convert_encoding( $mapped_value, 'UTF-8', 'UTF-8' );
             }
-            return $this->arrayToObject($mapped_and_encoded );
+            return $this->arrayToObject( $mapped_and_encoded );
         });
 
         /*
