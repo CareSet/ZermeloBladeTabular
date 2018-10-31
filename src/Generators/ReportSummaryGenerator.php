@@ -18,8 +18,8 @@ class ReportSummaryGenerator extends ReportGenerator implements GeneratorInterfa
     public function toJson()
     {
         return [
-            'Report_Name' => $this->cache->getReport()->getReportName(),
-            'Report_Description' => $this->cache->getReport()->getReportDescription(),
+            'Report_Name' => $this->cache->getReport()->GetReportName(),
+            'Report_Description' => $this->cache->getReport()->GetReportDescription(),
             'selected-data-option' => $this->cache->getReport()->getParameter( 'data-option' ),
             'columns' => $this->runSummary(),
             'cache_meta_generated_this_request' => $this->cache->getGeneratedThisRequest(),
