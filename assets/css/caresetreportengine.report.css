@@ -181,6 +181,14 @@ text.node-label
 	background-color: orange;
 }
 
+/* Override buttons within button group because bootstrap always adds a radius to dropdown-toggle, which makes
+ColVis dropdown look strange
+ */
+.btn-group > button:not(:last-of-type) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
 .dataTables_filter, .dataTables_length
 {
 	display: inline-block;

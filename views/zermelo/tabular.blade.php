@@ -25,9 +25,9 @@
 
 
 <script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/datatables/datatables.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/popper.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/datatables/datatables.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/bootstrap/js/bootstrap.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/moment.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/daterangepicker.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.doubleScroll.js"></script>
@@ -124,18 +124,13 @@
                 },
                 {
                     extend: 'colvis',
-                    text: '&nbsp;<i class="fa fa-columns"></i>&nbsp;',
+                    text: '&nbsp;<span class="fa fa-columns"></span>&nbsp;',
                     titleAttr: 'Column Visibility',
-                    init: function ( dt, node, config ) { $(node).tooltip(); }
-                },
-                {
-                    text: '&nbsp;<select id="report_table_freeze_selector"><option value="" disabled>Freeze Column</option><option value=0 selected>None</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>',
-                    titleAttr: 'Freeze Column',
-                    init: function ( dt, node, config ) { $(node).tooltip(); }
+                   // init: function ( dt, node, config ) { $(node).tooltip(); }
                 },
                 {
                     name: 'Expand',
-                    text: '&nbsp;<i class="fa fa-expand"></i>&nbsp;',
+                    text: '&nbsp;<span class="fa fa-expand"></span>&nbsp;',
                     titleAttr: 'Maximize View',
                     init: function ( dt, node, config ) { $(node).tooltip(); },
                     action: function(e,dt,node,config) {
@@ -146,9 +141,12 @@
                 },
                 {
                     extend: 'csv',
-                    text: '&nbsp;<i class="fa fa-download"></i>&nbsp;',
+                    text: '&nbsp;<span class="fa fa-download"></span>&nbsp;',
                     titleAttr: 'Download CSV',
                     init: function ( dt, node, config ) { $(node).tooltip(); },
+					action: function(e,dt,node,config) {
+                        window.location = '{{ url( $presenter->getDownloadUri() ) }}';
+					},
                     exportOptions: {
                         format: {
                             header: formatHeader
@@ -157,7 +155,7 @@
                 },
                 {
                     extend: 'print',
-                    text: '&nbsp;<i class="fa fa-print"></i>&nbsp;',
+                    text: '&nbsp;<span class="fa fa-print"></span>&nbsp;',
                     title:  function() {
                         var title = window.document.title;
                         return title;
@@ -172,7 +170,7 @@
                         id: 'cache-meta-button'
                     },
                     autoClose: true,
-                    text: '&nbsp;<i id="cache-icon" class="fa fa-database"></i>&nbsp;',
+                    text: '&nbsp;<span id="cache-icon" class="fa fa-database"></span>&nbsp;',
                     className: 'cache-meta-info',
                     init: function (dt, node, config) {
                         var cache_enabled = data.cache_meta_cache_enabled;
@@ -557,12 +555,12 @@
                 }
             } );
 
-            $("body").on( 'click', '.dt-button', function() {
-                if(fixedColumns !== null)
-                {
-                    $("#report_table_freeze_selector").trigger("click");
-                }
-            });
+//            $("body").on( 'click', '.dt-button', function() {
+//                if(fixedColumns !== null)
+//                {
+//                    $("#report_table_freeze_selector").trigger("click");
+//                }
+//            });
 
             yadcf.init(ReportTable,filter_array);
 

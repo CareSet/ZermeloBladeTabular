@@ -76,6 +76,13 @@ class TabularPresenter extends AbstractPresenter
         $this->_summary_path = $summary_path;
     }
 
+    public function getDownloadUri()
+    {
+        $parameterString = implode("/", $this->_report->getMergedParameters() );
+        $report_api_uri = "/download/{$this->getReportPath()}/{$this->_report->getClassName()}/{$parameterString}";
+        return $report_api_uri;
+    }
+
     public function getReportUri()
     {
         $parameterString = implode("/", $this->_report->getMergedParameters() );

@@ -242,6 +242,55 @@ class ReportGenerator extends AbstractGenerator implements GeneratorInterface
         return $format;
     }
 
+    public function getCollection()
+    {
+        $Report = $this->cache->getReport();
+
+        /*
+        If there is a filter, lets apply it to each column
+         */
+        $filter = $Report->getInput('filter');
+        if ($filter && is_array($filter)) {
+            $associated_filter = [];
+            foreach($filter as $f=>$item)
+            {
+                $field = key($item);
+                $value = $item[$field];
+                $associated_filter[$field] = $value;
+            }
+
+            $this->addFilter($associated_filter);
+        }
+
+        $orderBy = $Report->getInput('order') ?? [];
+        $associated_orderby = [];
+
+        foreach ($orderBy as $order) {
+            $orderKey = key($order);
+            $direction = $order[$orderKey];
+            $associated_orderby[$orderKey] = $direction;
+        }
+        $this->orderBy($associated_orderby);
+
+        $table = $this->cache->getTable();
+
+        /*
+        Transform each row using $Report->MapRow()
+         */
+        $collection = $table->get();
+        $collection->transform(function ($value, $key) use ($Report) {
+            $value_array = $this->objectToArray( $value );
+            $mapped_row = $Report->MapRow($value_array, $key);
+            $mapped_and_encoded = [];
+            foreach ( $mapped_row as $mapped_key => $mapped_value ) {
+                $mapped_and_encoded[$mapped_key]= mb_convert_encoding( $mapped_value, 'UTF-8', 'UTF-8' );
+            }
+            return $this->arrayToObject( $mapped_and_encoded );
+        });
+
+        return $collection;
+    }
+
     /**
      * ReportModelJson
      * Return the ZermeloReport as a pagable model
