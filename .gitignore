@@ -1,20 +1,44 @@
-vendor/
-node_modules/
-npm-debug.log
 
-# Laravel 4 specific
-bootstrap/compiled.php
-app/storage/
+#CareSet defaults
+*.yaml
+notgit/
 
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
-storage/*.key
-.env.*.php
-.env.php
+#cruft blocks
+.DS_Store
+Thumbs.db
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+nbproject
+
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*.csv
+*~
+*.sass-cache
+
 .env
-Homestead.yaml
-Homestead.json
+composer.lock
+ 
+#ignore vagrant
+.vagrant/
 
-# Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
-.rocketeer/
+#ignore local data files
+*.data
+
+#ignore log files
+/log/*.txt
+/log/*.log
+/cronlog/*
+
+#json auth files like from google.
+*.auth.json

@@ -1,9 +1,9 @@
 <div class="container-fluid">
 	<div>
-		<h1> {{ $presenter->getReport()->getReportName()  }}</h1>
+		<h1> {{ $presenter->getReport()->GetReportName()  }}</h1>
 	</div>
 	<div>
-		{!! $presenter->getReport()->getReportDescription() !!}
+		{!! $presenter->getReport()->GetReportDescription() !!}
 	</div>
 
 	<div id="user-variables" style="display:none">

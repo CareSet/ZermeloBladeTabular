@@ -18,7 +18,8 @@ class ApiController implements ControllerInterface, DownloadableInterface
     public function show( ZermeloReport $report )
     {
         $presenter = new TabularPresenter( $report );
-        $presenter->setApiPrefix( api_prefix() );
+	$api_prefix = trim( config("zermelo.URI_API_PREFIX"), "/ " );
+        $presenter->setApiPrefix( $api_prefix );
         $presenter->setReportPath( config('zermelobladetabular.TABULAR_URI_PREFIX') );
         $presenter->setSummaryPath( config('zermelobladetabular.SUMMARY_URI_PREFIX') );
         $cache = new DatabaseCache( $report );
@@ -28,7 +29,8 @@ class ApiController implements ControllerInterface, DownloadableInterface
 
     public function prefix() : string
     {
-        $prefix = api_prefix()."/".config('zermelobladetabular.TABULAR_URI_PREFIX', "" );
+	$api_prefix = trim( config("zermelo.URI_API_PREFIX"), "/ " );
+        $prefix = $api_prefix."/".config('zermelobladetabular.TABULAR_URI_PREFIX', "" );
         return $prefix;
     }
 
