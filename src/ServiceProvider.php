@@ -4,21 +4,16 @@ namespace CareSet\ZermeloBladeTabular;
 
 use CareSet\Zermelo\Models\AbstractZermeloProvider;
 use CareSet\ZermeloBladeTabular\Console\ZermeloBladeTabularInstallCommand;
-use CareSet\ZermeloBladeTabular\Controllers\ApiController;
-use CareSet\ZermeloBladeTabular\Controllers\SummaryController;
-use CareSet\ZermeloBladeTabular\Controllers\WebController;
+use Illuminate\Support\Facades\Route;
 
 
 Class ServiceProvider extends AbstractZermeloProvider
 {
-    protected $controllers = [
-        ApiController::class,
-        SummaryController::class,
-        WebController::class
-    ];
-
     protected function onBeforeRegister()
     {
+
+        $this->registerWebRoutes();
+
         /*
          * Register our zermelo view make command which:
          *  - Copies views
@@ -46,5 +41,47 @@ Class ServiceProvider extends AbstractZermeloProvider
         }
 
         $this->loadViewsFrom( resource_path( 'views/zermelo' ), 'Zermelo');
+    }
+
+    /**
+     * Load the given routes file if routes are not already cached.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadRoutesFrom($path)
+    {
+        if (! $this->app->routesAreCached()) {
+            require $path;
+        }
+    }
+
+    /**
+     * Register the package routes.
+     *
+     * @return void
+     */
+    protected function registerWebRoutes()
+    {
+        $configuration = $this->routeConfiguration();
+        Route::group($configuration, function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        });
+    }
+
+    /**
+     * Get the Nova route group configuration array.
+     *
+     * @return array
+     */
+    protected function routeConfiguration()
+    {
+        return [
+            'namespace' => 'CareSet\ZermeloBladeTabular\Http\Controllers',
+          //  'domain' => config('zermelo.domain', null),
+            'as' => 'zermelo.tabular.',
+            'prefix' => config( 'zermelobladetabular.TABULAR_URI_PREFIX' ),
+            'middleware' => 'web',
+        ];
     }
 }
