@@ -11,9 +11,6 @@ Class ServiceProvider extends AbstractZermeloProvider
 {
     protected function onBeforeRegister()
     {
-
-        $this->registerWebRoutes();
-
         /*
          * Register our zermelo view make command which:
          *  - Copies views
@@ -39,6 +36,8 @@ Class ServiceProvider extends AbstractZermeloProvider
                 __DIR__.'/../config/zermelobladetabular.php', 'zermelobladetabular'
             );
         }
+
+        $this->registerWebRoutes();
 
         $this->loadViewsFrom( resource_path( 'views/zermelo' ), 'Zermelo');
     }
