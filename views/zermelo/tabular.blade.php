@@ -101,6 +101,8 @@
         var sockets = [];
         $("#save-sockets").click( function(e) {
             let form_data = $("#sockets-form").serializeArray();
+            // clear sockets
+            sockets = [];
             jQuery.each( form_data, function( i, field ) {
                 let name = field.name;
                 let isOn = field.value;
