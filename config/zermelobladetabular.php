@@ -9,6 +9,11 @@ return [
      */
     'TABULAR_URI_PREFIX' => env("TABULAR_URI_PREFIX","Zermelo"),
 
+    /**
+     * Middleware on the tabular web routes
+     */
+    'MIDDLEWARE' => env("MIDDLEWARE", [ "web" ]),
+
 
     /**
      * The template the controller will use to render the report

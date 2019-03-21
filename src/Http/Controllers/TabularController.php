@@ -17,7 +17,7 @@ class TabularController
 
         $user = Auth::guard()->user();
         if ( $user ) {
-            $presenter->setToken( $user->last_token );
+            $presenter->setToken( $user->getRememberToken() );
         }
 
         $view = config("zermelobladetabular.TABULAR_VIEW_TEMPLATE");
