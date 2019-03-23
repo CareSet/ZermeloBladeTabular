@@ -92,7 +92,7 @@
 
 <script type="text/javascript">
 
-    $(function() {
+    $(document).ready(function() {
 
         var columnMap = [];
         var fixedColumns = null;
@@ -101,8 +101,6 @@
         var sockets = [];
         $("#save-sockets").click( function(e) {
             let form_data = $("#sockets-form").serializeArray();
-            // clear sockets
-            sockets = [];
             jQuery.each( form_data, function( i, field ) {
                 let name = field.name;
                 let isOn = field.value;
@@ -411,15 +409,13 @@
             }); /* end forEach data.columns */
 
 
-            var defaultPageLength = 50;
-            if(localStorage.getItem("Zermelo_defaultPlageLength"))
-            {
-                defaultPageLength = localStorage.getItem("Zermelo_defaultPlageLength");
+            var defaultPageLength = localStorage.getItem("Zermelo_defaultPlageLength");
+            if ( defaultPageLength == "undefined" ) {
+                defaultPageLength = 50;
             }
 
             var detailRows = [];
             var ReportTable = $('#report_datatable').DataTable( {
-                pageLength: defaultPageLength,
 
                 dom: '<"report-table-wrapper"<"table-control"<"float-left control-box"Blf<"after-menu-addition">><"float-right"ip><"clearfix"><"#report_menu_wrapper">>tr>',
                 stateSave: true,
@@ -431,10 +427,8 @@
                     Define the length, first array is 'visible' text,
                     and the 2nd array is what gets sent back to the server
                 */
-                lengthMenu: [
-                    [50,100,500,1000],
-                    [50,100,500,1000]
-                ],
+                lengthMenu: [50,100,500,1000],
+                pageLength: parseInt( defaultPageLength ),
 
                 buttons: buttons,
 
@@ -491,20 +485,26 @@
                     /*
                         Fetch the data via getJSON and pass it back using the 'callback' provided by DataTable
                     */
+                    var page = 1;
+                    var length = defaultPageLength;
+                    if ( data.length != "undefined" ) {
+                        page = (data.start / data.length) + 1;
+                        length = data.length;
+					}
 
                     var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
                     var merge_get_params = {
-                        'data-option': '{{ $presenter->getReport()->GetBoltId() }}',
                         'token': '{{ $presenter->getToken() }}',
-                        'page': (data.start / data.length) + 1,
+                        'page': parseInt(page),
                         "order": callbackOrder,
-                        "length": data.length,
+                        "length": parseInt(length),
                         "filter": searches,
 						"clear_cache": $("#clear_cache").val() ,
-						"sockets": sockets // KCC Pass sockets ???
+						"sockets": sockets // Pass sockets for "Current Data View"
                     };
                     var merge = $.extend({}, passthrough_params, merge_get_params)
-                    localStorage.setItem("Zermelo_defaultPlageLength",data.length);
+                    localStorage.setItem("Zermelo_defaultPlageLength",length);
+                    $("[name='report_datatable_length']").val(length);
 
                     var merge_clone = $.extend({},merge);
                     delete merge_clone['token'];
@@ -512,7 +512,7 @@
                     var param = decodeURIComponent( $.param(merge) );
                     $.getJSON('{{ $presenter->getReportUri() }}', param
                     ).always(function(data) {
-                        settings.json = data; // Make sure to set setting so callbacks have data
+                        // settings.json = data; // Make sure to set setting so callbacks have data
                         callback({
                             data: data.data,
                             recordsTotal: data.total,
