@@ -1,28 +1,85 @@
-<div class="container-fluid">
-	<div>
-		<h1> {{ $presenter->getReport()->GetReportName()  }}</h1>
-	</div>
-	<div>
-		{!! $presenter->getReport()->GetReportDescription() !!}
+<div id="app">
+	<div class="container-fluid">
+		<div>
+			<h1> {{ $presenter->getReport()->getReportName()  }}</h1>
+		</div>
+		<div>
+			{!! $presenter->getReport()->getReportDescription() !!}
+		</div>
+
+		<div id="user-variables" style="display:none">
+			<input type="hidden" id="clear_cache" value=""/>
+			<input type="hidden" id="cache_expires" value=""/>
+		</div>
+
+		<div style='display: none' id='json_error_message' class="alert alert-danger" role="alert">
+
+		</div>
+
+		<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%;"></table>
 	</div>
 
-	<div id="user-variables" style="display:none">
-		<input type="hidden" id="clear_cache" value=""/>
-		<input type="hidden" id="cache_expires" value=""/>
+	<div id="bottom_locator" style="
+		position: fixed;
+		bottom: 10px;
+	"></div>
+
+
+	<!-- Data View Modal -->
+	<div class="modal fade" id="current_data_view" tabindex="-1" role="dialog" aria-labelledby="current_data_view" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<form id="sockets-form">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Current Data View</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-5">
+								<h6>Wrenches</h6>
+							</div>
+							<div class="col-7">
+								<h6>Sockets</h6>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-5">
+								<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									@foreach ($presenter->getReport()->getActiveWrenches() as $wrench)
+										<a class="nav-link {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}-tab" data-toggle="pill" href="#v-pills-{{$wrench->id}}" role="tab" aria-controls="v-pills-{{$wrench->id}}" aria-selected="true">{{ $wrench->wrench_label }}</a>
+									@endforeach
+								</div>
+							</div>
+							<div class="col-7">
+								<div class="tab-content" id="v4-pills-tabContent">
+									@foreach ($presenter->getReport()->getActiveWrenches() as $wrench )
+										<div class="tab-pane fade show {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}" role="tabpanel" aria-labelledby="v-pills-{{$wrench->id}}-tab">
+											@foreach ( $wrench->sockets as $socket )
+												<div class="custom-control custom-radio">
+													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" class="custom-control-input">
+													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->wrench_label}}</label>
+												</div>
+											@endforeach
+										</div>
+									@endforeach
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" id="save-sockets" class="btn btn-primary">Save changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
 	</div>
-
-	<div style='display: none' id='json_error_message' class="alert alert-danger" role="alert">
-
-	</div>
-
-	<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%;"></table>
 </div>
-
-<div id="bottom_locator" style="
-    position: fixed;
-    bottom: 10px;
-"></div>
-
 
 <script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/datatables/datatables.js"></script>
@@ -35,10 +92,32 @@
 
 <script type="text/javascript">
 
-    $(function() {
+    $(document).ready(function() {
 
         var columnMap = [];
         var fixedColumns = null;
+
+        // Socket API payload
+        var sockets = [];
+        $("#save-sockets").click( function(e) {
+            let form_data = $("#sockets-form").serializeArray();
+            jQuery.each( form_data, function( i, field ) {
+                let name = field.name;
+                let isOn = field.value;
+                var id = $('input[name='+name+']:checked').attr('id');
+                if (isOn) {
+                    let wrenchId = $("#" + id).attr('data-wrench-id');
+                	let socketId = $("#" + id).attr('data-socket-id');
+                	sockets.push({
+						wrenchId: wrenchId,
+						socketId: socketId
+					});
+            	}
+            });
+
+            $('#current_data_view').modal('toggle');
+            $("#report_datatable").DataTable().ajax.reload();
+        });
 
         function set_cache_timer()
 		{
@@ -119,7 +198,7 @@
                     text: 'Current Data View',
                     className: 'text-icon',
                     action: function(e,dt,node,config) {
-                        $('#data-option-collapse').collapse('toggle');
+                        $('#current_data_view').modal('toggle');
                     }
                 },
                 {
@@ -330,15 +409,13 @@
             }); /* end forEach data.columns */
 
 
-            var defaultPageLength = 50;
-            if(localStorage.getItem("Zermelo_defaultPlageLength"))
-            {
-                defaultPageLength = localStorage.getItem("Zermelo_defaultPlageLength");
+            var defaultPageLength = localStorage.getItem("Zermelo_defaultPlageLength");
+            if ( defaultPageLength == "undefined" ) {
+                defaultPageLength = 50;
             }
 
             var detailRows = [];
             var ReportTable = $('#report_datatable').DataTable( {
-                pageLength: defaultPageLength,
 
                 dom: '<"report-table-wrapper"<"table-control"<"float-left control-box"Blf<"after-menu-addition">><"float-right"ip><"clearfix"><"#report_menu_wrapper">>tr>',
                 stateSave: true,
@@ -350,10 +427,8 @@
                     Define the length, first array is 'visible' text,
                     and the 2nd array is what gets sent back to the server
                 */
-                lengthMenu: [
-                    [50,100,500,1000],
-                    [50,100,500,1000]
-                ],
+                lengthMenu: [50,100,500,1000],
+                pageLength: parseInt( defaultPageLength ),
 
                 buttons: buttons,
 
@@ -410,19 +485,26 @@
                     /*
                         Fetch the data via getJSON and pass it back using the 'callback' provided by DataTable
                     */
+                    var page = 1;
+                    var length = defaultPageLength;
+                    if ( data.length != "undefined" ) {
+                        page = (data.start / data.length) + 1;
+                        length = data.length;
+					}
 
                     var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
                     var merge_get_params = {
-                        'data-option': '{{ $presenter->getReport()->GetBoltId() }}',
                         'token': '{{ $presenter->getToken() }}',
-                        'page': (data.start / data.length) + 1,
+                        'page': parseInt(page),
                         "order": callbackOrder,
-                        "length": data.length,
+                        "length": parseInt(length),
                         "filter": searches,
-						"clear_cache": $("#clear_cache").val()
+						"clear_cache": $("#clear_cache").val() ,
+						"sockets": sockets // Pass sockets for "Current Data View"
                     };
                     var merge = $.extend({}, passthrough_params, merge_get_params)
-                    localStorage.setItem("Zermelo_defaultPlageLength",data.length);
+                    localStorage.setItem("Zermelo_defaultPlageLength",length);
+                    $("[name='report_datatable_length']").val(length);
 
                     var merge_clone = $.extend({},merge);
                     delete merge_clone['token'];
