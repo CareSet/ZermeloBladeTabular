@@ -512,7 +512,7 @@
                     var param = decodeURIComponent( $.param(merge) );
                     $.getJSON('{{ $presenter->getReportUri() }}', param
                     ).always(function(data) {
-                        // settings.json = data; // Make sure to set setting so callbacks have data
+                        settings.json = data; // Make sure to set setting so callbacks have data
                         callback({
                             data: data.data,
                             recordsTotal: data.total,
