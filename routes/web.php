@@ -1,3 +1,3 @@
 <?php
 
-Route::get( '/{report_key}', 'TabularController@show' );
+Route::get( '/{report_key}/{parameters?}', 'TabularController@show' )->where(['parameters' => '.*']);
