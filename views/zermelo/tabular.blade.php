@@ -31,7 +31,7 @@
 			<div class="modal-content">
 				<form id="sockets-form">
 					<div class="modal-header">
-						<h5 class="modal-title" id="exampleModalLabel">Current Data View</h5>
+						<h5 class="modal-title" id="exampleModalLabel">Data Options</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
@@ -197,7 +197,7 @@
             var buttons = [
                 {
                     name: 'dataview',
-                    text: 'Current Data View',
+                    text: 'Data Options',
                     className: 'text-icon',
                     action: function(e,dt,node,config) {
                         $('#current_data_view').modal('toggle');
@@ -502,7 +502,7 @@
                         "length": parseInt(length),
                         "filter": searches,
 						"clear_cache": $("#clear_cache").val() ,
-						"sockets": sockets // Pass sockets for "Current Data View"
+						"sockets": sockets // Pass sockets for "Data Options"
                     };
                     var merge = $.extend({}, passthrough_params, merge_get_params)
                     localStorage.setItem("Zermelo_defaultPlageLength",length);
