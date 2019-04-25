@@ -37,14 +37,6 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						<div class="row">
-							<div class="col-5">
-								<h6>Wrenches</h6>
-							</div>
-							<div class="col-7">
-								<h6>Sockets</h6>
-							</div>
-						</div>
 
 						<div class="row">
 							<div class="col-5">
