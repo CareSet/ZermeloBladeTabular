@@ -37,7 +37,7 @@
 						</button>
 					</div>
 					<div class="modal-body">
-
+						@if ($presenter->getReport()->hasActiveWrenches())
 						<div class="row">
 							<div class="col-5">
 								<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -61,6 +61,14 @@
 								</div>
 							</div>
 						</div>
+						@elseif
+						<!-- we only get here if there are no active wrenches -->
+						<div class="row">
+							<div class='col-12'>
+								No Data Options have been configured for this report
+							</div>
+						</div>
+						@else
 
 					</div>
 					<div class="modal-footer">
