@@ -68,7 +68,7 @@
 								No Data Options have been configured for this report
 							</div>
 						</div>
-						@else
+						@endif
 
 					</div>
 					<div class="modal-footer">
