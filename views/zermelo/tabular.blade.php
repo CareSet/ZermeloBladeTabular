@@ -61,7 +61,7 @@
 								</div>
 							</div>
 						</div>
-						@elseif
+						@else
 						<!-- we only get here if there are no active wrenches -->
 						<div class="row">
 							<div class='col-12'>
