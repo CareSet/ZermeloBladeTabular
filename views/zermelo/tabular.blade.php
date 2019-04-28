@@ -226,7 +226,7 @@
                     titleAttr: 'Download CSV',
                     init: function ( dt, node, config ) { $(node).tooltip(); },
 					action: function(e,dt,node,config) {
-                        window.location = '{{ url( $presenter->getDownloadUri() ) }}';
+                        window.location = '{!! $presenter->getDownloadUri() !!}';
 					},
                     exportOptions: {
                         format: {
