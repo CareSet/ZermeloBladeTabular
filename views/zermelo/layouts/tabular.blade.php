@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href='{{ bootstap_css() }}' />
     <link rel="stylesheet" type="text/css" href='{{ asset("vendor/CareSet/css/caresetreportengine.report.css") }}' />
     <link rel="stylesheet" type="text/css" href='{{ asset("vendor/CareSet/datatables/datatables.min.css") }}' />
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
 
