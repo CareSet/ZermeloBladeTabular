@@ -52,7 +52,7 @@
 										<div class="tab-pane fade show {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}" role="tabpanel" aria-labelledby="v-pills-{{$wrench->id}}-tab">
 											@foreach ( $wrench->sockets as $socket )
 												<div class="custom-control custom-radio">
-													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" class="custom-control-input">
+													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->wrench_label}}" class="custom-control-input">
 													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->wrench_label}}</label>
 												</div>
 											@endforeach
@@ -79,6 +79,39 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Report Download Modal -->
+	<div class="modal fade" id="report_download_modal" tabindex="-1" role="dialog" aria-labelledby="report_download_modal" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<form id="report-download-form" method="POST" action="{!! $presenter->getDownloadUri() !!}">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Download Options</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">Data View Download Options</h5>
+								<table class="table table-striped table-bordered" id="download-data-options-table">
+								</table>
+								<div class="form-check">
+									<input type="checkbox" class="use_current_data_view" id="use_current_data_view" checked>
+									<label class="use_current_data_view" for="use_current_data_view">Download with Current Data Options</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" id="initiate-report-download" class="btn btn-primary">Download</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
@@ -94,31 +127,100 @@
 
     $(document).ready(function() {
 
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         var columnMap = [];
         var fixedColumns = null;
 
         // Socket API payload
         var sockets = [];
-        $("#save-sockets").click( function(e) {
+        var activeWrenchNames = [];
+
+        // Refresh sockets on page reload, in case we had options set, and did a "refresh"
+        refresh_sockets();
+
+        function refresh_sockets() {
+
             let form_data = $("#sockets-form").serializeArray();
             // Empty sockets array before we refill it
             sockets = [];
+            activeWrenchNames = [];
+
             jQuery.each( form_data, function( i, field ) {
                 let name = field.name;
-                let isOn = field.value;
+                let isOn = ( field.value == 'on');
                 var id = $('input[name='+name+']:checked').attr('id');
                 if (isOn) {
                     let wrenchId = $("#" + id).attr('data-wrench-id');
-                	let socketId = $("#" + id).attr('data-socket-id');
-                	sockets.push({
-						wrenchId: wrenchId,
-						socketId: socketId
-					});
-            	}
-            });
+                    let socketId = $("#" + id).attr('data-socket-id');
+                    sockets.push({
+                        wrenchId: wrenchId,
+                        socketId: socketId
+                    });
 
+                    // Now store the labels
+                    let wrenchLabel = $('#'+id).attr('data-wrench-label');
+                    let socketLabel = $('#'+id).attr('data-socket-label');
+                    activeWrenchNames.push({
+                        wrenchLabel: wrenchLabel,
+                        socketLabel: socketLabel
+                    });
+                }
+            });
+		}
+
+        $("#save-sockets").click( function(e) {
+            // Get the sockets from the Data Options form
+			refresh_sockets();
             $('#current_data_view').modal('toggle');
             $("#report_datatable").DataTable().ajax.reload();
+        });
+
+        // On the report download modal, click "download" event
+        $("#initiate-report-download").click( function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+			let form = $("#report-download-form");
+			// Clear the hidden data view options
+			$("#data-view-options-form-download").empty();
+
+			// If we do not want to dowwnload with data view options,
+			// empty sockets array.
+			let userCurrentDataView = ( $("#use_current_data_view").is(":checked") );
+			if ( userCurrentDataView == false ) {
+                sockets = [];
+			}
+
+			let post_data = {
+			    "_token" : '{{csrf_token()}}',
+                "filter": '',
+                "clear_cache": $("#clear_cache").val(),
+                "sockets": sockets // Pass sockets for "Data Options"
+			};
+
+            // Submit the form to download content
+			let downloadURI = "{{ $presenter->getDownloadUri() }}";
+            let param = decodeURIComponent( $.param(post_data) );
+            $.get( downloadURI, param, function( data, textStatus, jqXHR ) {
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style = "display: none";
+                const blob = new Blob([data], {type: "octet/stream"}),
+                    url = window.URL.createObjectURL(blob);
+                a.href = url;
+                var header = jqXHR.getResponseHeader('Content-Disposition');
+                var filename = header.match(/filename="(.+)"/)[1];
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }).done( function() {
+                $('#report_download_modal').modal('toggle');
+			}, 'json');
+
         });
 
         function set_cache_timer()
@@ -226,13 +328,26 @@
                     titleAttr: 'Download CSV',
                     init: function ( dt, node, config ) { $(node).tooltip(); },
 					action: function(e,dt,node,config) {
-                        window.location = '{!! $presenter->getDownloadUri() !!}';
-					},
-                    exportOptions: {
-                        format: {
-                            header: formatHeader
+
+                        // Set up the display for the download options before we show the modal
+
+                        // Add currrently selected options to download form
+                        refresh_sockets();
+
+                        if ( sockets.length == 0 ) {
+                            $("#download-data-options-table").html("No data view options in use");
+                            $("#use_current_data_view").prop("disabled", true);
+						} else {
+
+                            // Now dynamically pupulate the download options table with our current sockets
+                            $("#download-data-options-table").html("");
+                            jQuery.each(activeWrenchNames, function (key, option) {
+                                $("#download-data-options-table").append("<tr><td>" + option.wrenchLabel + "</td><td>" + option.socketLabel + "</td></tr>");
+                            });
                         }
-                    }
+
+                        $('#report_download_modal').modal('toggle');
+					}
                 },
                 {
                     extend: 'print',
