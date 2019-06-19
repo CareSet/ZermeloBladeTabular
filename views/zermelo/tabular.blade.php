@@ -97,12 +97,31 @@
 								<h5 class="card-title">Data View Download Options</h5>
 								<table class="table table-striped table-bordered" id="download-data-options-table">
 								</table>
-								<div class="form-check">
-									<input type="checkbox" class="use_current_data_view" id="use_current_data_view" checked>
-									<label class="use_current_data_view" for="use_current_data_view">Download with Current Data Options</label>
-								</div>
 							</div>
 						</div>
+						<br>
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">Search Filter Download Options</h5>
+								<table class="table table-striped table-bordered" id="download-search-filter-options-table">
+								</table>
+							</div>
+						</div>
+						<br>
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">URL Parameter Download Options</h5>
+								<table class="table table-striped table-bordered" id="download-url-params-options-table">
+								</table>
+							</div>
+						</div>
+						<br>
+
+						<div class="btn-group" style="display:flex;">
+							<input style="font-size:60%; width:100%" type="text" id="current-download-link" value=""/>
+							</button>
+						</div>
+
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -113,7 +132,6 @@
 		</div>
 	</div>
 </div>
-
 <script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/datatables/datatables.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/popper.min.js"></script>
@@ -122,10 +140,25 @@
 <script type="text/javascript" src="/vendor/CareSet/js/daterangepicker.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.doubleScroll.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/jquery.dataTables.yadcf.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/js/zermelo.js"></script>
 
 <script type="text/javascript">
 
     $(document).ready(function() {
+
+        var zermelo = new Zermelo(
+            '{{ $presenter->getReportUri() }}', // Pass the required Report Base URI
+            '{{ $presenter->getDownloadUri() }}', // Pass the required Download URI
+            {
+                // Optional parameters
+
+				// Get the CSRF Token
+                token: '{{ csrf_token() }}',
+
+				// These are parameters passed to us from the server
+				passthrough_params: {!! $presenter->getReport()->getRequestFormInput( true ) !!}
+            }
+        );
 
         $.ajaxSetup({
             headers: {
@@ -188,39 +221,10 @@
 			// Clear the hidden data view options
 			$("#data-view-options-form-download").empty();
 
-			// If we do not want to dowwnload with data view options,
-			// empty sockets array.
-			let userCurrentDataView = ( $("#use_current_data_view").is(":checked") );
-			if ( userCurrentDataView == false ) {
-                sockets = [];
-			}
-
-			let post_data = {
-			    "_token" : '{{csrf_token()}}',
-                "filter": '',
-                "clear_cache": $("#clear_cache").val(),
-                "sockets": sockets // Pass sockets for "Data Options"
-			};
-
-            // Submit the form to download content
-			let downloadURI = "{{ $presenter->getDownloadUri() }}";
-            let param = decodeURIComponent( $.param(post_data) );
-            $.get( downloadURI, param, function( data, textStatus, jqXHR ) {
-                const a = document.createElement("a");
-                document.body.appendChild(a);
-                a.style = "display: none";
-                const blob = new Blob([data], {type: "octet/stream"}),
-                    url = window.URL.createObjectURL(blob);
-                a.href = url;
-                var header = jqXHR.getResponseHeader('Content-Disposition');
-                var filename = header.match(/filename="(.+)"/)[1];
-                a.download = filename;
-                a.click();
-                window.URL.revokeObjectURL(url);
-            }).done( function() {
+			// Execute the download based on current options
+			zermelo.serverDownloadRequest().done( function() {
                 $('#report_download_modal').modal('toggle');
-			}, 'json');
-
+            });
         });
 
         function set_cache_timer()
@@ -252,30 +256,32 @@
         set_cache_timer();
         var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
         var param = decodeURIComponent( $.param(passthrough_params) );
+
+        // This is the summary API call that will get the column headers
+		// If this call succeeds, we call the server to get the data
         $.getJSON(
-            '{{ $presenter->getSummaryUri()."/".urlencode($presenter->getReport()->getRequestFormInput(false)) }}',
+            '{{ $presenter->getSummaryUri() }}',
 			param
 		).fail(function( jqxhr, textStatus, error) {
 
-		console.log(jqxhr);
-		console.log(textStatus);
-		console.log(error);
-		
-		var is_admin = true; //this should be set via a call to the presenter
+            console.log(jqxhr);
+            console.log(textStatus);
+            console.log(error);
 
-		if(is_admin){
-			if(typeof jqxhr.responseJSON.message !== 'undefined'){
-				$('#json_error_message').html("<h1> You had a error </h1> <p> " + jqxhr.responseJSON.message + "</p>");
-			}else{
-				$('#json_error_message').html("<h1> You had a error, bad enough that there was no JSON  </h1>");
-			}
-		}else{
-			$('#json_error_message').html("<h1> There was an error generating this report</h1>");	
-		}
-		$('#json_error_message').show();	
+            var is_admin = true; //this should be set via a call to the presenter
+
+            if(is_admin){
+                if(typeof jqxhr.responseJSON.message !== 'undefined'){
+                    $('#json_error_message').html("<h1> You had a error </h1> <p> " + jqxhr.responseJSON.message + "</p>");
+                }else{
+                    $('#json_error_message').html("<h1> You had a error, bad enough that there was no JSON  </h1>");
+                }
+            }else{
+                $('#json_error_message').html("<h1> There was an error generating this report</h1>");
+            }
+            $('#json_error_message').show();
 
 	    }).done(function(data) {
-
 
             function resizeTable()
             {
@@ -335,16 +341,46 @@
                         refresh_sockets();
 
                         if ( sockets.length == 0 ) {
-                            $("#download-data-options-table").html("No data view options in use");
-                            $("#use_current_data_view").prop("disabled", true);
+
+                            // There are no data view options, tell user
+                            $("#download-data-options-table").html("<tr><td colspan='2'>No data view options in use</td><tr>");
+
 						} else {
 
                             // Now dynamically pupulate the download options table with our current sockets
                             $("#download-data-options-table").html("");
-                            jQuery.each(activeWrenchNames, function (key, option) {
+                            $.each(activeWrenchNames, function (key, option) {
                                 $("#download-data-options-table").append("<tr><td>" + option.wrenchLabel + "</td><td>" + option.socketLabel + "</td></tr>");
                             });
                         }
+
+                        // Dynamically populate the search filter options table with our active search filters
+                        $("#download-search-filter-options-table").html("");
+						if ( zermelo.getSearchFilters().length > 0 ) {
+                            $.each(zermelo.getSearchFilters(), function (key, option) {
+                                for (var i in option) {
+                                    $("#download-search-filter-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
+                                }
+                            });
+                        } else {
+                            $("#download-search-filter-options-table").html("<tr><td colspan='2'>No table filters in use</td><tr>");
+                        }
+
+                        // Dynamically populate the URL Parameter options table with our active parameters from the address bar
+                        $("#download-url-params-options-table").html("");
+						if ( Object.keys(zermelo.getUrlSearchParams()).length > 0 ) {
+                            $.each(zermelo.getUrlSearchParams(), function (key, option) {
+                                for (var i in option) {
+                                    $("#download-url-params-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
+                                }
+                            });
+                        } else {
+                            $("#download-url-params-options-table").html("<tr><td colspan='2'>No URL parameters in use</td><tr>");
+						}
+
+                        // Add the fully built download URI to the modal (this can be used to link to the download)
+                        var downloadURI = zermelo.getDownloadURI();
+                        $("#current-download-link").val(downloadURI);
 
                         $('#report_download_modal').modal('toggle');
 					}
@@ -421,11 +457,8 @@
                 }
             ];
 
-
             var columnHeaders = []; /* for DataTables */
             var index = 0;
-
-
 
             var filter_array = [];
             data.columns.forEach(function(item) {
@@ -526,7 +559,7 @@
             }); /* end forEach data.columns */
 
 
-            var defaultPageLength = localStorage.getItem("Zermelo_defaultPlageLength");
+            var defaultPageLength = localStorage.getItem("Zermelo_defaultPageLength");
             if ( defaultPageLength == "undefined" ) {
                 defaultPageLength = 50;
             }
@@ -535,7 +568,12 @@
             var ReportTable = $('#report_datatable').DataTable( {
 
                 dom: '<"report-table-wrapper"<"table-control"<"float-left control-box"Blf<"after-menu-addition">><"float-right"ip><"clearfix"><"#report_menu_wrapper">>tr>',
-                stateSave: true,
+
+				/*
+				 * Save state in local storage, including the
+				 * current data filters and sort order
+				 */
+				stateSave: true,
                 colReorder: true,
                 scrollX: true,
                 scrollY: '200px',
@@ -560,7 +598,6 @@
                 */
                 columns: columnHeaders,
 
-
                 /*
                     Override every ajax call to the server.
                     Pass over the sort, filter, and what records to fetch
@@ -569,24 +606,20 @@
 
                     var columns = data.columns;
                     var order = data.order;
-                    var searches = [];
 
+                    // Clear the search filters before we apply the currently set filters
+                    zermelo.clearSearchFilters();
 
-                    columns.forEach(function(item)
-                    {
-                        if(item.search.value != "")
-                        {
-                            var pair = {};
-                            pair[ item.data ] = item.search.value
-                            searches.push(pair);
+                    // Tell our zermelo state about each column filter
+                    columns.forEach(function(item) {
+                        if ( item.search.value != "" ) {
+                            zermelo.pushColumnSearchFilter( item.data, item.search.value );
                         }
                     });
 
-                    if(data.search.value!="")
-                    {
-                        searches.push({
-                            "_": data.search.value
-                        });
+                    // Tell our zermelo state about the global filter
+                    if( data.search.value != "" ) {
+                        zermelo.pushGlobalSearchFilter( data.search.value );
                     }
 
                     /*
@@ -609,24 +642,32 @@
                         length = data.length;
 					}
 
-                    var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
+					// Get the parameters passed in via URI
+                    var passthrough_params = zermelo.getPassthroughParams();
+
+                    // Set up the ajax API parameters
                     var merge_get_params = {
                         'token': '{{ $presenter->getToken() }}',
                         'page': parseInt(page),
                         "order": callbackOrder,
                         "length": parseInt(length),
-                        "filter": searches,
+                        "filter": zermelo.getSearchFilters(),
 						"clear_cache": $("#clear_cache").val() ,
 						"sockets": sockets // Pass sockets for "Data Options"
                     };
-                    var merge = $.extend({}, passthrough_params, merge_get_params)
-                    localStorage.setItem("Zermelo_defaultPlageLength",length);
+
+                    // Merge the URI Parameters with the ajax parameters
+                    var merge = $.extend({}, passthrough_params, merge_get_params);
+
+                    localStorage.setItem("Zermelo_defaultPageLength",length);
                     $("[name='report_datatable_length']").val(length);
 
                     var merge_clone = $.extend({},merge);
                     delete merge_clone['token'];
 
                     var param = decodeURIComponent( $.param(merge) );
+
+                    // This is the AJAX call to the zermelo API to get the data for datatables
                     $.getJSON('{{ $presenter->getReportUri() }}', param
                     ).always(function(data) {
                         settings.json = data; // Make sure to set setting so callbacks have data
