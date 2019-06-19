@@ -220,6 +220,12 @@ ColVis dropdown look strange
     overflow: auto;
 	background-color: white;
 }
+td.text-bold {
+	font-weight: bold;
+}
+td.text-italic {
+	font-style: italic;
+}
 
 td.details-control
 {
