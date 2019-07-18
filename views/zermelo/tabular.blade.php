@@ -52,8 +52,8 @@
 										<div class="tab-pane fade show {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}" role="tabpanel" aria-labelledby="v-pills-{{$wrench->id}}-tab">
 											@foreach ( $wrench->sockets as $socket )
 												<div class="custom-control custom-radio">
-													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->wrench_label}}" class="custom-control-input">
-													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->wrench_label}}</label>
+													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="custom-control-input">
+													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->socket_label}}</label>
 												</div>
 											@endforeach
 										</div>
