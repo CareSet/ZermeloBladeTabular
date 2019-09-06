@@ -132,7 +132,7 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript" src="/vendor/CareSet/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/js/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/datatables/datatables.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/js/popper.min.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/bootstrap/js/bootstrap.js"></script>
