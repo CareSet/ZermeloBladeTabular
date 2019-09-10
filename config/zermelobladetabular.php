@@ -20,4 +20,9 @@ return [
      * This is used in WebController implementation of ControllerInterface@show method
      */
     "TABULAR_VIEW_TEMPLATE"=>env("TABULAR_VIEW_TEMPLATE","Zermelo::layouts.tabular"),
+
+    /**
+     * Bootstrap CSS file, you may overwrite the default here.
+     */
+    'BOOTSTRAP_CSS_LOCATION' => 'vendor/CareSet/zermelobladetabular/bootstrap-4.3.1/css/bootstrap.min.css',
 ];

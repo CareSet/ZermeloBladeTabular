@@ -132,15 +132,15 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript" src="/vendor/CareSet/js/jquery-3.4.1.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/datatables/datatables.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/popper.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/bootstrap/js/bootstrap.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/moment.min.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/daterangepicker.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/jquery.doubleScroll.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/jquery.dataTables.yadcf.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/zermelo.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/datatables/datatables.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/popper.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/bootstrap-4.3.1/js/bootstrap.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/moment.min.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/daterangepicker.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.doubleScroll.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.dataTables.yadcf.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/zermelo.js"></script>
 
 <script type="text/javascript">
 
