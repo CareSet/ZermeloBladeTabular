@@ -140,7 +140,7 @@
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/daterangepicker.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.doubleScroll.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.dataTables.yadcf.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/zermelo.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/js/zermelo.js"></script>
 
 <script type="text/javascript">
 
