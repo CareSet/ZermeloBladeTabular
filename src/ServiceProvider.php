@@ -3,6 +3,7 @@
 namespace CareSet\ZermeloBladeTabular;
 
 use CareSet\Zermelo\Models\AbstractZermeloProvider;
+use CareSet\ZermeloBladeTabular\Console\MakeTabularReportCommand;
 use CareSet\ZermeloBladeTabular\Console\ZermeloBladeTabularInstallCommand;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,8 @@ Class ServiceProvider extends AbstractZermeloProvider
          *  - Exports Assets
          */
         $this->commands([
-            ZermeloBladeTabularInstallCommand::class
+            ZermeloBladeTabularInstallCommand::class,
+            MakeTabularReportCommand::class
         ]);
 
         /*
