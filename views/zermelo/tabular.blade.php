@@ -84,7 +84,7 @@
 	<div class="modal fade" id="report_download_modal" tabindex="-1" role="dialog" aria-labelledby="report_download_modal" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
-				<form id="report-download-form" method="POST" action="{!! $presenter->getDownloadUri() !!}">
+				<form id="report-download-form" method="POST" action="{!! $download_uri !!}">
 					<div class="modal-header">
 						<h5 class="modal-title" id="exampleModalLabel">Download Options</h5>
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -147,8 +147,8 @@
     $(document).ready(function() {
 
         var zermelo = new Zermelo(
-            '{{ $presenter->getReportUri() }}', // Pass the required Report Base URI
-            '{{ $presenter->getDownloadUri() }}', // Pass the required Download URI
+            '{{ $report_uri }}', // Pass the required Report Base URI
+            '{{ $download_uri }}', // Pass the required Download URI
             {
                 // Optional parameters
 
@@ -260,7 +260,7 @@
         // This is the summary API call that will get the column headers
 		// If this call succeeds, we call the server to get the data
         $.getJSON(
-            '{{ $presenter->getSummaryUri() }}',
+            '{{ $summary_uri }}',
 			param
 		).fail(function( jqxhr, textStatus, error) {
 
@@ -561,7 +561,7 @@
 
             var defaultPageLength = localStorage.getItem("Zermelo_defaultPageLength");
             if ( defaultPageLength == "undefined" ) {
-                defaultPageLength = 50;
+                defaultPageLength = '{{ $page_length }}'; // This is a string, but we do parseInt later
             }
 
             var detailRows = [];
@@ -668,7 +668,7 @@
                     var param = decodeURIComponent( $.param(merge) );
 
                     // This is the AJAX call to the zermelo API to get the data for datatables
-                    $.getJSON('{{ $presenter->getReportUri() }}', param
+                    $.getJSON('{{ $report_uri }}', param
                     ).always(function(data) {
                         settings.json = data; // Make sure to set setting so callbacks have data
                         callback({

@@ -27,6 +27,6 @@ class ZermeloBladeTabularInstallCommand extends AbstractZermeloInstallCommand
      *
      * @var string
      */
-    protected $signature = 'install:zermelobladetabular
+    protected $signature = 'zermelo:install_zermelobladetabular
                     {--force : Overwrite existing views by default}';
 }
