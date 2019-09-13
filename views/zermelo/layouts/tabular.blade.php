@@ -1,7 +1,7 @@
 <html>
 <head>
 
-    <title>{{ $presenter->getReport()->getReportName()  }}</title>
+    <title>{{ $report->getReportName()  }}</title>
 
     <link href='{{ asset("vendor/CareSet/zermelobladetabular/fontawesome-free-5.10.2-web/css/all.css") }}' rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href='{{ $bootstrap_css_location }}' />

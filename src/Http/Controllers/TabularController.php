@@ -3,6 +3,7 @@
 namespace CareSet\ZermeloBladeTabular\Http\Controllers;
 
 use CareSet\Zermelo\Http\Controllers\AbstractWebController;
+use CareSet\Zermelo\Interfaces\ZermeloReportInterface;
 use CareSet\Zermelo\Models\Presenter;
 use CareSet\ZermeloBladeTabular\TabularPresenter;
 
@@ -31,24 +32,27 @@ class TabularController extends AbstractWebController
 
     /**
      * @param $report
-     * @return TabularPresenter
+     * @return void
      *
-     * Override this method to do any custom configuration for this controller,
-     * like pushing variables onto the view
+     * Implement this method to do any custom configuration for this report,
+     * like pushing variables onto the view that need to be there for EVERY report
      */
-    public function buildPresenter($report)
+    public function onBeforeShown(ZermeloReportInterface $report)
     {
-        $presenter = new Presenter($report);
         $bootstrap_css_location = asset(config('zermelobladetabular.BOOTSTRAP_CSS_LOCATION'));
-        $presenter->pushViewVariable('bootstrap_css_location', $bootstrap_css_location);
-        $presenter->pushViewVariable('download_uri', $this->getDownloadUri($report));
-        $presenter->pushViewVariable('report_uri', $this->getReportUri($report));
-        $presenter->pushViewVariable('summary_uri', $this->getSummaryUri($report));
-        $presenter->pushViewVariable('page_length', $this->getPageLength($report));
-
-        return $presenter;
+        $report->pushViewVariable('bootstrap_css_location', $bootstrap_css_location);
+        $report->pushViewVariable('download_uri', $this->getDownloadUri($report));
+        $report->pushViewVariable('report_uri', $this->getReportUri($report));
+        $report->pushViewVariable('summary_uri', $this->getSummaryUri($report));
+        $report->pushViewVariable('page_length', $this->getPageLength($report));
     }
 
+    /**
+     * @param $report
+     * @return string
+     *
+     * Helper function for building the download URI
+     */
     protected function getDownloadUri($report)
     {
         $parameterString = implode("/", $report->getMergedParameters() );

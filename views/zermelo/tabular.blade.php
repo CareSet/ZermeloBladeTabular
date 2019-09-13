@@ -1,10 +1,10 @@
 <div id="app">
 	<div class="container-fluid">
 		<div>
-			<h1> {{ $presenter->getReport()->getReportName()  }}</h1>
+			<h1> {{ $report->getReportName()  }}</h1>
 		</div>
 		<div>
-			{!! $presenter->getReport()->getReportDescription() !!}
+			{!! $report->getReportDescription() !!}
 		</div>
 
 		<div id="user-variables" style="display:none">
@@ -37,22 +37,22 @@
 						</button>
 					</div>
 					<div class="modal-body">
-						@if ($presenter->getReport()->hasActiveWrenches())
+						@if ($report->hasActiveWrenches())
 						<div class="row">
 							<div class="col-5">
 								<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-									@foreach ($presenter->getReport()->getActiveWrenches() as $wrench)
+									@foreach ($report->getActiveWrenches() as $wrench)
 										<a class="nav-link {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}-tab" data-toggle="pill" href="#v-pills-{{$wrench->id}}" role="tab" aria-controls="v-pills-{{$wrench->id}}" aria-selected="true">{{ $wrench->wrench_label }}</a>
 									@endforeach
 								</div>
 							</div>
 							<div class="col-7">
 								<div class="tab-content" id="v4-pills-tabContent">
-									@foreach ($presenter->getReport()->getActiveWrenches() as $wrench )
+									@foreach ($report->getActiveWrenches() as $wrench )
 										<div class="tab-pane fade show {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}" role="tabpanel" aria-labelledby="v-pills-{{$wrench->id}}-tab">
 											@foreach ( $wrench->sockets as $socket )
 												<div class="custom-control custom-radio">
-													<input {{ $presenter->getReport()->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="custom-control-input">
+													<input {{ $report->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="custom-control-input">
 													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->socket_label}}</label>
 												</div>
 											@endforeach
@@ -140,7 +140,7 @@
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/daterangepicker.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.doubleScroll.js"></script>
 <script type="text/javascript" src="/vendor/CareSet/zermelobladetabular/js/jquery.dataTables.yadcf.js"></script>
-<script type="text/javascript" src="/vendor/CareSet/js/zermelo.js"></script>
+<script type="text/javascript" src="/vendor/CareSet/zermelo_api/js/zermelo.js"></script>
 
 <script type="text/javascript">
 
@@ -156,7 +156,7 @@
                 token: '{{ csrf_token() }}',
 
 				// These are parameters passed to us from the server
-				passthrough_params: {!! $presenter->getReport()->getRequestFormInput( true ) !!}
+				passthrough_params: {!! $report->getRequestFormInput( true ) !!}
             }
         );
 
@@ -254,7 +254,7 @@
 		}
 
         set_cache_timer();
-        var passthrough_params = {!! $presenter->getReport()->getRequestFormInput( true ) !!};
+        var passthrough_params = {!! $report->getRequestFormInput( true ) !!};
         var param = decodeURIComponent( $.param(passthrough_params) );
 
         // This is the summary API call that will get the column headers
@@ -268,7 +268,7 @@
             console.log(textStatus);
             console.log(error);
 
-            var is_admin = true; //this should be set via a call to the presenter
+            var is_admin = true; //this should be set via a variable on the report
 
             if(is_admin){
                 if(typeof jqxhr.responseJSON.message !== 'undefined'){
@@ -647,7 +647,7 @@
 
                     // Set up the ajax API parameters
                     var merge_get_params = {
-                        'token': '{{ $presenter->getToken() }}',
+                        'token': '{{ $report->getToken() }}',
                         'page': parseInt(page),
                         "order": callbackOrder,
                         "length": parseInt(length),
