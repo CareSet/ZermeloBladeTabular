@@ -53,7 +53,7 @@
 											@foreach ( $wrench->sockets as $socket )
 												<div class="custom-control custom-radio">
 													<input {{ $report->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="custom-control-input">
-													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->socket_label}}</label>
+													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->wrench_label}}</label>
 												</div>
 											@endforeach
 										</div>
