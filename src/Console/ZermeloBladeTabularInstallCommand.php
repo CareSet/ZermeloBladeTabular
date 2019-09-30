@@ -29,4 +29,11 @@ class ZermeloBladeTabularInstallCommand extends AbstractZermeloInstallCommand
      */
     protected $signature = 'zermelo:install_zermelobladetabular
                     {--force : Overwrite existing views by default}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Install Zermelo Blade Tabular report view';
 }

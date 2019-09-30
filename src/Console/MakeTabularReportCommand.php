@@ -21,7 +21,7 @@ class MakeTabularReportCommand extends Command
      *
      * @var string
      */
-    protected $description = '';
+    protected $description = 'Make a tabular report class using the template';
 
 
     /**
