@@ -564,6 +564,10 @@
                 defaultPageLength = '{{ $page_length }}'; // This is a string, but we do parseInt later
             }
 
+            // If we have search filters applied, let the user know, and give the user
+			// an oppertunity to clear them when the results are empty
+            var emptyTableString = "<span id='emptyTableString'>No data available in table</span>";
+
             var detailRows = [];
             var ReportTable = $('#report_datatable').DataTable( {
 
@@ -597,6 +601,10 @@
                     we need to define the header fetching the data
                 */
                 columns: columnHeaders,
+
+				language: {
+                    "emptyTable": emptyTableString
+				},
 
                 /*
                     Override every ajax call to the server.
@@ -676,6 +684,8 @@
                             recordsTotal: data.total,
                             recordsFiltered: data.total,
                         });
+
+                        // Update the cache UI
                         $("#clear_cache").val("");
 
                         var cache_enabled = data.cache_meta_cache_enabled;
@@ -696,6 +706,24 @@
 
                         $("#cache_expires").val( data.cache_meta_expire_time );
                         $("#cache-meta-button").attr("data-original-title", info);
+
+                        // If we have zero results, and we have search filters applied, let the user know
+						// This text will replace the default "No data available in table"
+                        var search_filters = zermelo.getSearchFilters();
+                        if (search_filters.length > 0) {
+                            var emptyTableString = "<p>No data available in table, possibly because you have the following search filters applied:</p>";
+                            $.each(zermelo.getSearchFilters(), function (key, option) {
+                                var name =  '';
+                                var value = '';
+                                for (var i in option) {
+                                    name = i;
+                                    value = option[i];
+                                }
+                                emptyTableString += "<p>" + name + "=>" + value + "</p>";
+                            });
+                            emptyTableString += "<p>Click to clear all filters and reload table</p><p><button class='btn btn-primary clear-all-search-filters' href='#'>Clear Filters</button></p>";
+                            $("#emptyTableString").html(emptyTableString);
+                        }
                     });
                 },
 
@@ -803,6 +831,16 @@
 //            });
 
             yadcf.init(ReportTable,filter_array);
+
+            // This is the button that appears when there are no results, likely because
+			// of column filters applied. We have to put scope on "body" because of the way the button is generated
+            $("body").on("click", ".clear-all-search-filters", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Use the yadcf API to reset all filters
+                yadcf.exResetAllFilters(ReportTable);
+            });
 
 
             $("body").on("change","#report_table_freeze_selector",function()
