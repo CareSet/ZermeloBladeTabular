@@ -17,6 +17,13 @@
 		</div>
 
 		<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%;"></table>
+
+		<div id="loader" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-sm modal-dialog-centered">
+				<div class="loader"></div>
+			</div>
+		</div>
+
 	</div>
 
 	<div id="bottom_locator" style="
@@ -256,6 +263,9 @@
         set_cache_timer();
         var passthrough_params = {!! $report->getRequestFormInput( true ) !!};
         var param = decodeURIComponent( $.param(passthrough_params) );
+
+        // Before we call the API to build headers, show the processing indicator
+        $('#loader').modal();
 
         // This is the summary API call that will get the column headers
 		// If this call succeeds, we call the server to get the data
@@ -612,6 +622,9 @@
                 */
                 ajax: function (data, callback, settings) {
 
+                    // if our loader is hidden, show it
+                    $('#loader').modal('show');
+
                     var columns = data.columns;
                     var order = data.order;
 
@@ -724,6 +737,8 @@
                             emptyTableString += "<p>Click to clear all filters and reload table</p><p><button class='btn btn-primary clear-all-search-filters' href='#'>Clear Filters</button></p>";
                             $("#emptyTableString").html(emptyTableString);
                         }
+
+                        $('#loader').modal('hide'); // Hide the laoder
                     });
                 },
 
@@ -732,7 +747,7 @@
                     Send all processing to server side
                 */
                 serverSide: true,
-                processing: true,
+                processing: false, // Set to false because we use our own loading indicator that starts when headers are being generated
                 paging: true,
 
 
