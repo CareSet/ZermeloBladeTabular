@@ -59,8 +59,8 @@
 										<div class="tab-pane fade show {{ ($loop->first) ?  'active' : '' }}" id="v-pills-{{$wrench->id}}" role="tabpanel" aria-labelledby="v-pills-{{$wrench->id}}-tab">
 											@foreach ( $wrench->sockets as $socket )
 												<div class="custom-control custom-radio">
-													<input {{ $report->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="wrench-{{$wrench->id}}-socket" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="custom-control-input">
-													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->wrench_label}}</label>
+													<input {{ $report->isActiveSocket($socket->id) ? 'checked' : '' }} type="radio" data-wrench-id="{{$wrench->id}}" data-socket-id="{{$socket->id}}" id="wrench-{{$wrench->id}}-socket-{{$socket->id}}" name="sockets[{{$wrench->id}}]" value="{{$socket->id}}" data-wrench-label="{{ $wrench->wrench_label }}" data-socket-label="{{$socket->socket_label}}" class="socket custom-control-input">
+													<label class="custom-control-label" for="wrench-{{$wrench->id}}-socket-{{$socket->id}}">{{$socket->socket_label}}</label>
 												</div>
 											@endforeach
 										</div>
@@ -177,7 +177,7 @@
         var fixedColumns = null;
 
         // Socket API payload
-        var sockets = [];
+        var sockets = {};
         var activeWrenchNames = [];
 
         // Refresh sockets on page reload, in case we had options set, and did a "refresh"
@@ -185,31 +185,39 @@
 
         function refresh_sockets() {
 
-            let form_data = $("#sockets-form").serializeArray();
+            // Get the socket inputs by selecting from socket form, using socket class
+            let form_data = $("#sockets-form .socket").serializeArray();
+
             // Empty sockets array before we refill it
-            sockets = [];
+            sockets = {};
+
+            // The active wrnch names are used for download optons to display the data options that are in-use
             activeWrenchNames = [];
 
             jQuery.each( form_data, function( i, field ) {
-                let name = field.name;
-                let isOn = ( field.value == 'on');
-                var id = $('input[name='+name+']:checked').attr('id');
-                if (isOn) {
-                    let wrenchId = $("#" + id).attr('data-wrench-id');
-                    let socketId = $("#" + id).attr('data-socket-id');
-                    sockets.push({
-                        wrenchId: wrenchId,
-                        socketId: socketId
-                    });
 
-                    // Now store the labels
-                    let wrenchLabel = $('#'+id).attr('data-wrench-label');
-                    let socketLabel = $('#'+id).attr('data-socket-label');
-                    activeWrenchNames.push({
-                        wrenchLabel: wrenchLabel,
-                        socketLabel: socketLabel
-                    });
-                }
+                // name attribute of input contains wrench id
+                let name = field.name;
+
+                // socket id is in value attribute
+                let socketId = field.value;
+
+                // Wrench ID is in brackets, need to parse out
+                let wrenchId = name.slice(name.indexOf('[') +1,name.indexOf(']'));
+
+                // Store the wrenches/sockets in the same format as they would be submitted by form
+                sockets[wrenchId]= socketId;
+
+                // Build the id, which contains both wrench id and socket id
+                let id = "wrench-"+wrenchId+"-socket-"+socketId;
+
+                // Now store the labels if we need to display active data options
+                let wrenchLabel = $('#'+id).attr('data-wrench-label');
+                let socketLabel = $('#'+id).attr('data-socket-label');
+                activeWrenchNames.push({
+                    wrenchLabel: wrenchLabel,
+                    socketLabel: socketLabel
+                });
             });
 		}
 
