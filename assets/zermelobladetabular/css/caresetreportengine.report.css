@@ -13,6 +13,10 @@
 	100% { transform: rotate(360deg); }
 }
 
+#emptyTableString {
+	text-align: left;
+}
+
 .no-padding-left {
 	padding-left: 0px;
 }
