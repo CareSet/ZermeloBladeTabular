@@ -14,7 +14,7 @@ class MakeTabularReportCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'zermelo:make_tabular {report_name}';
+    protected $signature = 'zermelo:make_tabular {report_name} {{--squash}}';
 
     /**
      * The console command description.
@@ -45,8 +45,13 @@ class MakeTabularReportCommand extends Command
         $app_path = str_replace( "App/", "", $app_path );
         $path = app_path().'/'.$app_path.'/'.$report_name.'.php';
 
-        $fs->put($path, $content );
+        $is_squash = $this->option('squash',false);
 
-        $this->info("Successfuly created report `$path``");
+        if(!file_exists($path) || $is_squash){
+                $fs->put($path, $content );
+                $this->info("Successfuly created report `$path``");
+        }else{
+                $this->info("$path Already exists... use --squash if you are sure you want to overwrite");
+        }
     }
 }
