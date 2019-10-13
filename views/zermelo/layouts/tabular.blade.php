@@ -1,4 +1,5 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 
     <title>{{ $report->getReportName()  }}</title>
