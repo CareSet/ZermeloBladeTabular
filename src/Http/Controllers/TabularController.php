@@ -39,7 +39,8 @@ class TabularController extends AbstractWebController
      */
     public function onBeforeShown(ZermeloReportInterface $report)
     {
-        $bootstrap_css_location = asset(config('zermelobladetabular.BOOTSTRAP_CSS_LOCATION'));
+	//default to a sensible location for bootstrap in case the configuration value has not been set
+        $bootstrap_css_location = asset(config('zermelobladetabular.BOOTSTRAP_CSS_LOCATION','/css/bootstrap.min.css'));
         $report->pushViewVariable('bootstrap_css_location', $bootstrap_css_location);
         $report->pushViewVariable('download_uri', $this->getDownloadUri($report));
         $report->pushViewVariable('report_uri', $this->getReportUri($report));
