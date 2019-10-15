@@ -732,7 +732,10 @@
 						// This text will replace the default "No data available in table"
                         var search_filters = zermelo.getSearchFilters();
                         if (search_filters.length > 0) {
-                            var emptyTableString = "<p>No data available in table, possibly because you have the following search filters applied:</p>";
+                            var emptyTableString = "<h4> No data in table </h4> <div class='container fixed-bottom'> <div class='row'> <div class='col-md-5'> <div class='card'><div class='card-header'> <h3> Clear Filters </h3></div> <div class='card-body'>"; 
+                            emptyTableString += "<p class='card-text'><button class='btn btn-primary clear-all-search-filters' href='#'>Clear Filters</button>";
+
+			    emptyTableString += "<br> You can use this button to remove the filtes and reload the table. <br>  It is possible you are seeing no data because you have the following search filters applied: <ul class='list-group'>";
                             $.each(zermelo.getSearchFilters(), function (key, option) {
                                 var name =  '';
                                 var value = '';
@@ -740,9 +743,11 @@
                                     name = i;
                                     value = option[i];
                                 }
-                                emptyTableString += "<p>" + name + "=>" + value + "</p>";
+                                emptyTableString += "<li class='list-group-item'>" + name + "=>" + value + "</li>";
                             });
-                            emptyTableString += "<p>Click to clear all filters and reload table</p><p><button class='btn btn-primary clear-all-search-filters' href='#'>Clear Filters</button></p>";
+
+			    emptyTableString += "</ul></p></div></div></div></div><div class='row'><br>&nbsp;<br>&nbsp;<br></div></div>";
+
                             $("#emptyTableString").html(emptyTableString);
                         }
 
