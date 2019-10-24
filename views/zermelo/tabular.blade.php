@@ -266,9 +266,6 @@
         var passthrough_params = {!! $report->getRequestFormInput( true ) !!};
         var param = decodeURIComponent( $.param(passthrough_params) );
 
-        // Before we call the API to build headers, show the processing indicator
-        $('#loader').modal();
-
         // This is the summary API call that will get the column headers
 		// If this call succeeds, we call the server to get the data
         $.getJSON(
@@ -405,7 +402,10 @@
                         return title;
                     },
                     titleAttr: 'Print',
-                    init: function ( dt, node, config ) { $(node).tooltip(); }
+                    init: function ( dt, node, config ) { $(node).tooltip(); },
+					exportOptions: {
+                        stripHtml: false // Do not strip HTML so font-awesome icons and other html are printed (#31)
+					}
                 },
                 {
                     extend: 'collection',
@@ -625,9 +625,6 @@
                 */
                 ajax: function (data, callback, settings) {
 
-                    // if our loader is hidden, show it
-                    $('#loader').modal('show');
-
                     var columns = data.columns;
                     var order = data.order;
 
@@ -740,8 +737,6 @@
                             emptyTableString += "<p>Click to clear all filters and reload table</p><p><button class='btn btn-primary clear-all-search-filters' href='#'>Clear Filters</button></p>";
                             $("#emptyTableString").html(emptyTableString);
                         }
-
-                        $('#loader').modal('hide'); // Hide the laoder
                     });
                 },
 
