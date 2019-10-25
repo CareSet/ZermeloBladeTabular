@@ -10,6 +10,7 @@
 
 div.dataTables_wrapper div.dataTables_processing {
 	border: none;
+	background: transparent;
 }
 
 @keyframes spin {
