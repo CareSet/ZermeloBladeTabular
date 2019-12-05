@@ -10,11 +10,25 @@
 
 div.dataTables_wrapper div.dataTables_processing {
 	border: none;
+	background: transparent;
 }
 
 @keyframes spin {
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
+}
+
+footer.fixed {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	background-color: white;
+	border-top: 2px solid #dee2e6
+}
+
+footer.centered {
+	text-align: center;
 }
 
 #emptyTableString {
