@@ -19,7 +19,7 @@
 		<table class="display table table-bordered table-condensed table-striped table-hover" id="report_datatable" style="width:100%;"></table>
 
 
-		<footer class="{{ $footer_class }}">
+		<footer class="{{ $report->GetReportFooterClass() }}">
 			{!! $report->GetReportFooter() !!}
 		</footer>
 
