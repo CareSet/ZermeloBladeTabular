@@ -322,6 +322,9 @@
 			 * The only way to reset the number of fixed columns is to destroy and re-initiailize the table,
 			 * This method does that with a value of how many columns to anchor. If it's greater than Zero,
 			 * We use the value to initialize the number of columns fixed to the left
+			 *
+			 * TODO This is not used, but left here for future development, and the button that invokes
+			 * this function is commented out.
 			 * */
             function refreshFixedColumns(value)
 			{
@@ -330,7 +333,7 @@
                     ReportTable.destroy();
                     fixedColumns = null;
 
-                    // Reinitialize the table TODO move to funciton
+                    // Reinitialize the table
                     ReportTable = $('#report_datatable').DataTable( dataTableOptions );
 
                     ReportTable.on( 'column-reorder', function () {
@@ -373,6 +376,13 @@
                     titleAttr: 'Column Visibility',
 					init: function ( dt, node, config ) { $(node).tooltip(); }
                 },
+				/*
+                TODO removing the Fixed-Colum icon for now, which fixes a colum, or columns to the left of the table
+                so the user can scroll off the screen to columns on the right, and keep the left-most columns in view.
+                This mostly works, but there is an issue with column filtering interacting with the fixed-column behavior.
+            	See: https://github.com/CareSet/Zermelo/issues/56
+            	*/
+				/*
                 {
                     extend: 'collection',
 					name: 'fixedcols',
@@ -416,7 +426,7 @@
                             }
                         },
                     ]
-                },
+                },*/
                 {
                     name: 'Expand',
                     text: '&nbsp;<span class="fa fa-expand"></span>&nbsp;',
