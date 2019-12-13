@@ -78,14 +78,13 @@ Class ServiceProvider extends AbstractZermeloProvider
     protected function routeConfiguration()
     {
         $middleware = config('zermelobladetabular.TABULAR_MIDDLEWARE',[ 'web' ]);
-        $middlewareString = implode(",",$middleware);
 
         return [
             'namespace' => 'CareSet\ZermeloBladeTabular\Http\Controllers',
           //  'domain' => config('zermelo.domain', null),
             'as' => 'zermelo.tabular.',
             'prefix' => config( 'zermelobladetabular.TABULAR_URI_PREFIX' ),
-            'middleware' => $middlewareString,
+            'middleware' => $middleware,
         ];
     }
 }

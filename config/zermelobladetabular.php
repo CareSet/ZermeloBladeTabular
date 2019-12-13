@@ -12,7 +12,7 @@ return [
     /**
      * Middleware on the tabular web routes
      */
-    'MIDDLEWARE' => env("MIDDLEWARE", [ "web" ]),
+    'TABULAR_MIDDLEWARE' => env("TABULAR_MIDDLEWARE", [ "web" ]),
 
 
     /**

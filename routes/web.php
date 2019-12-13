@@ -1,3 +1,3 @@
 <?php
 
-Route::get( '/{report_key}/{parameters?}', 'TabularController@show' )->where(['parameters' => '.*']);
+Route::get( '/{report_key}/{parameters?}', 'TabularController@show' )->where(['parameters' => '.*'])->middleware('auth');
