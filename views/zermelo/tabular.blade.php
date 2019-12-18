@@ -228,6 +228,9 @@
                     socketLabel: socketLabel
                 });
             });
+
+            // Tell the api (for download)
+            zermelo.setSockets(sockets);
 		}
 
         $("#save-sockets").click( function(e) {
