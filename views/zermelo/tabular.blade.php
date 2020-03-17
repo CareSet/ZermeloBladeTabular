@@ -310,17 +310,6 @@
 
 	    }).done(function(data) {
 
-            function resizeTable()
-            {
-                var current_top = $(".dataTables_scrollBody").offset().top;
-                var fixed_bottom = $("#bottom_locator").offset().top;
-
-                var new_height = fixed_bottom - current_top;
-                $(".dataTables_scrollBody").css('height',new_height+'px');
-                $("#report_datatable").dataTable().fnSettings().oScroll.sY = new_height+'px';
-
-            }
-
             /**
 			 * The only way to reset the number of fixed columns is to destroy and re-initiailize the table,
 			 * This method does that with a value of how many columns to anchor. If it's greater than Zero,
@@ -438,7 +427,6 @@
                     action: function(e,dt,node,config) {
                         $(".report-table-wrapper").toggleClass('full_screen');
                         $(node).toggleClass('toggled');
-                        resizeTable();
                     }
                 },
                 {
@@ -696,7 +684,15 @@
                 stateSave: true,
                 colReorder: true,
                 scrollX: true,
-                scrollY: '200px',
+                scrollY: '800px',
+				scrollCollapse: true,
+				paging: true,
+
+				/*
+					Send all processing to server side
+				*/
+				serverSide: true,
+				processing: true,
 
                 /*
                     Define the length, first array is 'visible' text,
@@ -844,20 +840,9 @@
                     });
                 },
 
-
-                /*
-                    Send all processing to server side
-                */
-                serverSide: true,
-                processing: true,
-
-                paging: true,
-
-
                 initComplete: function(settings, json) {
-                    resizeTable();
+                    // Place initialization code here
                 },
-
 
                 rowCallback: function( row, data, index ) {
 
@@ -984,13 +969,7 @@
                     }
                 }
             });
-
-
-            $(window).resize(function() { resizeTable(); });
-
         }); /* end always on get Summary */
-
-
     });
 </script>
 <script type="text/javascript">
