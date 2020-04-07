@@ -189,6 +189,9 @@
         var sockets = {};
         var activeWrenchNames = [];
 
+        // Set up the default sort Order if there is one.
+		var defaultSortOrder = [];
+
         // Refresh sockets on page reload, in case we had options set, and did a "refresh"
         refresh_sockets();
 
@@ -281,7 +284,7 @@
 		}
 
         set_cache_timer();
-        var passthrough_params = {!! $report->getRequestFormInput( true ) !!};
+        var passthrough_params = zermelo.getPassthroughParams();
         var param = decodeURIComponent( $.param(passthrough_params) );
 
         // This is the summary API call that will get the column headers
@@ -556,7 +559,13 @@
 								});
 
                             }
-                        }
+                        },
+						{
+							text: 'Clear Local Storage',
+							action: function ( e, dt, node, config ) {
+								localStorage.clear();
+							}
+						}
 					]
                 }
             ]; // End of buttons array
@@ -662,6 +671,19 @@
 
             }); /* end forEach data.columns */
 
+			// We have to convert the column-name : direction format into column-index : direction format
+			var defaultSortOrderParam = zermelo.getPassthroughParam('order');
+			for (var sortOrderColumn in defaultSortOrderParam) {
+				var obj = defaultSortOrderParam[sortOrderColumn];
+				let column = '';
+				let direction = '';
+				for ([column, direction] of Object.entries(obj)) {}
+				var columnMapKey = "_"+`${column}`;
+				var orderItem = [];
+				orderItem.push(columnMap[columnMapKey].index);
+				orderItem.push(direction);
+				defaultSortOrder.push(orderItem);
+			}
 
             var defaultPageLength = localStorage.getItem("Zermelo_defaultPageLength");
             if ( defaultPageLength == "undefined" ) {
@@ -687,6 +709,11 @@
                 scrollY: '800px',
 				scrollCollapse: true,
 				paging: true,
+
+				/*
+				 * Set the default sort order based on configuration
+				 */
+				order: defaultSortOrder,
 
 				/*
 					Send all processing to server side
