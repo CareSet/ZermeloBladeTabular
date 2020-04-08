@@ -3,6 +3,8 @@
 namespace CareSet\ZermeloBladeTabular\Console;
 
 use CareSet\Zermelo\Console\AbstractZermeloInstallCommand;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 
 class ZermeloBladeTabularInstallCommand extends AbstractZermeloInstallCommand
 {
@@ -36,4 +38,19 @@ class ZermeloBladeTabularInstallCommand extends AbstractZermeloInstallCommand
      * @var string
      */
     protected $description = 'Install Zermelo Blade Tabular report view';
+
+    protected function exportAssets()
+    {
+        parent::exportAssets(); // Call parent export assets/
+
+        $config_changes = false;
+        if ( ! $this->option('force') ) {
+            if ( $this->confirm("Would you like to use your previously installed Bootstrap CSS file, and specify it's path?" )) {
+                $bootstrap_css_location = $this->ask("Please paste the path of your bootstrap CSS file relative to public");
+                // Write the bootstrap CSS location to the master config
+                config( [ 'zermelobladetabular.BOOTSTRAP_CSS_LOCATION' => $bootstrap_css_location ] );
+                $this->config_changes = true;
+            }
+        }
+    }
 }
