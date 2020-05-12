@@ -8,21 +8,21 @@ use Illuminate\Support\Facades\File;
 
 class ZermeloBladeTabularInstallCommand extends AbstractZermeloInstallCommand
 {
-    protected $view_path = __DIR__.'/../../views';
-
-    protected $asset_path = __DIR__.'/../../assets';
-
-    protected $config_file = __DIR__.'/../../config/zermelobladetabular.php';
-
     /**
      * The views that need to be exported.
      *
      * @var array
      */
-    protected $views = [
+    public static $views = [
         'zermelo/tabular.blade.php',
         'zermelo/layouts/tabular.blade.php',
     ];
+
+    protected static $view_path = __DIR__.'/../../views';
+
+    protected static $asset_path = __DIR__.'/../../assets';
+
+    protected static $config_file = __DIR__.'/../../config/zermelobladetabular.php';
 
     /**
      * The name and signature of the console command.

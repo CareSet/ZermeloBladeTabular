@@ -41,6 +41,10 @@ Class ServiceProvider extends AbstractZermeloProvider
 
         $this->registerWebRoutes();
 
+        // This function checks to make sure the views that are required are published, otherwise throws
+        // an exception
+        static::ensureViewsExist(ZermeloBladeTabularInstallCommand::class);
+
         $this->loadViewsFrom( resource_path( 'views/zermelo' ), 'Zermelo');
     }
 
