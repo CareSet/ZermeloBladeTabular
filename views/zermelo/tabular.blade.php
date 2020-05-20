@@ -706,7 +706,7 @@
                 stateSave: true,
                 colReorder: true,
                 scrollX: true,
-                scrollY: '800px',
+                scrollY: '100%',
 				scrollCollapse: true,
 				paging: true,
 

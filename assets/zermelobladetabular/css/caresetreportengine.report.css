@@ -53,7 +53,7 @@ footer.centered {
 
 .yadcf-filter-reset-button.range-number-slider-reset-button{
 	position: relative;
-	top: -6px;	
+	top: -6px;
 }
 
 .yadcf-filter {
@@ -67,11 +67,11 @@ footer.centered {
     background: white;
 }
 
-.ui-autocomplete .ui-menu-item { 
+.ui-autocomplete .ui-menu-item {
 	font-size:13px;
 }
 
-#ui-datepicker-div { 
+#ui-datepicker-div {
 	font-size:13px;
 }
 .yadcf-filter-wrapper {
@@ -210,7 +210,7 @@ text.node-label
 	margin: 0px;
 	padding: 0px 20px 0px 20px;
 }
-.dt-buttons a.btn svg 
+.dt-buttons a.btn svg
 {
 	position:absolute;
     top:50%;
@@ -220,6 +220,13 @@ text.node-label
 .dt-buttons a.toggled
 {
 	background-color: orange;
+}
+/*
+	Create a margin at the bottom of the scroll body in case there's a static
+	fixed text at the bottom of the page.
+ */
+.dataTables_scrollBody {
+	margin-bottom: 30px;
 }
 
 /* Override buttons within button group because bootstrap always adds a radius to dropdown-toggle, which makes
@@ -274,16 +281,16 @@ td.details-control
 	cursor: pointer;
 	vertical-align: middle !important;
 }
-td.details-control::before 
+td.details-control::before
 {
-	font-family: "Font Awesome 5 Free"; 
-	font-weight: 900; 
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
 	content: "\f055";
 	color: blue;
 }
 tr.details td.details-control:before  {
-	font-family: "Font Awesome 5 Free"; 
-	font-weight: 900; 
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
 	content: "\f056";
 	color: red;
 }
