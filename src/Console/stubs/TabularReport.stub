@@ -6,11 +6,15 @@ use CareSet\Zermelo\Reports\Tabular\AbstractTabularReport;
 class {{ report_name }} extends AbstractTabularReport
 {
     // define the report name
-    public function GetReportName(): string { return("{{ report_name }}"); }
+    public function GetReportName(): string { 
+	$report_name = 
+		"{{ report_name }}";
+	return($report_name); }
 
     // define the report description, HTML is ok here.
     public function GetReportDescription(): ?string {
-	$desc = "{{ report_name }} DESCRIPTION, OR CUSTOMIZE WITH OTHER HTML HERE!!"; 
+	$desc = 
+		"{{ report_name }} DESCRIPTION, OR CUSTOMIZE WITH OTHER HTML HERE!!"; 
 	return($desc);
     }
 
@@ -167,5 +171,12 @@ WHERE TABLE_SCHEMA != 'mysql' AND TABLE_SCHEMA != 'information_schema'
         return(1200); //twenty minutes by default
    }
 
+    /**
+    * This function will determine if replacing /Zermelo/ with /ZeremeloSQL/ will show the SQL of the report 	
+    * for security reasons it should be off by default. 
+    */
+   public function isSQLPrintEnabled(): bool{
+         return(false); //protect the sql by default
+   }
 
 }
