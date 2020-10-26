@@ -357,14 +357,16 @@
             };
 
             var buttons = [
-                {
-                    name: 'dataview',
-                    text: 'Data Options',
-                    className: 'text-icon',
-                    action: function(e,dt,node,config) {
-                        $('#current_data_view').modal('toggle');
-                    }
-                },
+				@if ($report->hasActiveWrenches()) // Only show the Data Options button if there are active wrenches on this report
+				{
+					name: 'dataview',
+					text: 'Data Options',
+					className: 'text-icon',
+					action: function(e,dt,node,config) {
+						$('#current_data_view').modal('toggle');
+					}
+				},
+				@endif
                 {
                     extend: 'colvis',
                     text: '&nbsp;<span class="fa fa-columns"></span>&nbsp;',
