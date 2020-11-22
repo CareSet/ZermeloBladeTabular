@@ -158,8 +158,8 @@
             {
                 // Optional parameters
 
-				// Get the CSRF Token
-                token: '{{ csrf_token() }}',
+				// Get the JWT Token
+                token: '{{ $report->getToken() }}',
 
 				// These are parameters passed to us from the server
 				passthrough_params: {!! $report->getRequestFormInput( true ) !!}
@@ -284,14 +284,13 @@
 		}
 
         set_cache_timer();
-        var passthrough_params = zermelo.getPassthroughParams();
-        var param = decodeURIComponent( $.param(passthrough_params) );
+        var api_params = zermelo.getAllApiParams();
 
         // This is the summary API call that will get the column headers
 		// If this call succeeds, we call the server to get the data
         $.getJSON(
             '{{ $summary_uri }}',
-			param
+			api_params
 		).fail(function( jqxhr, textStatus, error) {
 
             console.log(jqxhr);
