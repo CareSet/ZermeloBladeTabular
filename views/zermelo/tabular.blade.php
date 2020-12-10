@@ -125,7 +125,6 @@
 
 						<div class="btn-group" style="display:flex;">
 							<input style="font-size:60%; width:100%" type="text" id="current-download-link" value=""/>
-							</button>
 						</div>
 
 					</div>
@@ -234,6 +233,49 @@
 
             // Tell the api (for download)
             zermelo.setSockets(sockets);
+		}
+
+		function setup_download_modal_for_display() {
+			// Add currrently selected options to download form
+			refresh_sockets();
+
+			if ( sockets.length == 0 ) {
+
+				// There are no data view options, tell user
+				$("#download-data-options-table").html("<tr><td colspan='2'>No data view options in use</td><tr>");
+
+			} else {
+
+				// Now dynamically pupulate the download options table with our current sockets
+				$("#download-data-options-table").html("");
+				$.each(activeWrenchNames, function (key, option) {
+					$("#download-data-options-table").append("<tr><td>" + option.wrenchLabel + "</td><td>" + option.socketLabel + "</td></tr>");
+				});
+			}
+
+			// Dynamically populate the search filter options table with our active search filters
+			$("#download-search-filter-options-table").html("");
+			if ( zermelo.getSearchFilters().length > 0 ) {
+				$.each(zermelo.getSearchFilters(), function (key, option) {
+					for (var i in option) {
+						$("#download-search-filter-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
+					}
+				});
+			} else {
+				$("#download-search-filter-options-table").html("<tr><td colspan='2'>No table filters in use</td><tr>");
+			}
+
+			// Dynamically populate the URL Parameter options table with our active parameters from the address bar
+			$("#download-url-params-options-table").html("");
+			if ( Object.keys(zermelo.getUrlSearchParams()).length > 0 ) {
+				$.each(zermelo.getUrlSearchParams(), function (key, option) {
+					for (var i in option) {
+						$("#download-url-params-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
+					}
+				});
+			} else {
+				$("#download-url-params-options-table").html("<tr><td colspan='2'>No URL parameters in use</td><tr>");
+			}
 		}
 
         $("#save-sockets").click( function(e) {
@@ -434,61 +476,50 @@
                     }
                 },
                 {
-                    extend: 'csv',
+					extend: 'collection',
+					name: 'downloads',
+					attr: {
+						id: 'download-button'
+					},
+					autoClose: true,
                     text: '&nbsp;<span class="fa fa-download"></span>&nbsp;',
+					className: 'download-info',
+					init: function (dt, node, config) {},
+					buttons : [{
+						extend: 'csv',
+						text: '&nbsp;<span class="fa fa-file-csv"></span> Download CSV&nbsp;',
                     titleAttr: 'Download CSV',
                     init: function ( dt, node, config ) { $(node).tooltip(); },
 					action: function(e,dt,node,config) {
 
                         // Set up the display for the download options before we show the modal
+							setup_download_modal_for_display();
 
-                        // Add currrently selected options to download form
-                        refresh_sockets();
+							// Add the fully built download URI to the modal (this can be used to link to the download)
+							zermelo.setDownloadFileType('csv');
+							var downloadURI = zermelo.getDownloadURI();
+							$("#current-download-link").val(downloadURI);
 
-                        if ( sockets.length == 0 ) {
-
-                            // There are no data view options, tell user
-                            $("#download-data-options-table").html("<tr><td colspan='2'>No data view options in use</td><tr>");
-
-						} else {
-
-                            // Now dynamically pupulate the download options table with our current sockets
-                            $("#download-data-options-table").html("");
-                            $.each(activeWrenchNames, function (key, option) {
-                                $("#download-data-options-table").append("<tr><td>" + option.wrenchLabel + "</td><td>" + option.socketLabel + "</td></tr>");
-                            });
-                        }
-
-                        // Dynamically populate the search filter options table with our active search filters
-                        $("#download-search-filter-options-table").html("");
-						if ( zermelo.getSearchFilters().length > 0 ) {
-                            $.each(zermelo.getSearchFilters(), function (key, option) {
-                                for (var i in option) {
-                                    $("#download-search-filter-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
-                                }
-                            });
-                        } else {
-                            $("#download-search-filter-options-table").html("<tr><td colspan='2'>No table filters in use</td><tr>");
-                        }
-
-                        // Dynamically populate the URL Parameter options table with our active parameters from the address bar
-                        $("#download-url-params-options-table").html("");
-						if ( Object.keys(zermelo.getUrlSearchParams()).length > 0 ) {
-                            $.each(zermelo.getUrlSearchParams(), function (key, option) {
-                                for (var i in option) {
-                                    $("#download-url-params-options-table").append("<tr><td>" + i + "</td><td>" + option[i] + "</td></tr>");
-                                }
-                            });
-                        } else {
-                            $("#download-url-params-options-table").html("<tr><td colspan='2'>No URL parameters in use</td><tr>");
+							$('#report_download_modal').modal('toggle');
 						}
+					}, {
+							extend: 'csv',
+							text: '&nbsp;<span class="fa fa-file-excel"></span> Download Excel&nbsp;',
+							titleAttr: 'Download Excel',
+							init: function ( dt, node, config ) { $(node).tooltip(); },
+							action: function(e,dt,node,config) {
+
+								// Set up the display for the download options before we show the modal
+								setup_download_modal_for_display();
 
                         // Add the fully built download URI to the modal (this can be used to link to the download)
+								zermelo.setDownloadFileType('excel')
                         var downloadURI = zermelo.getDownloadURI();
                         $("#current-download-link").val(downloadURI);
 
                         $('#report_download_modal').modal('toggle');
 					}
+						}]
                 },
                 {
                     extend: 'print',
